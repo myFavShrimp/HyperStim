@@ -1,0 +1,16 @@
+{
+  "version": "5",
+  "specifiers": {
+    "npm:alien-signals@^2.0.5": "2.0.5"
+  },
+  "npm": {
+    "alien-signals@2.0.5": {
+      "integrity": "sha512-PdJB6+06nUNAClInE3Dweq7/2xVAYM64vvvS1IHVHSJmgeOtEdrAGyp7Z2oJtYm0B342/Exd2NT0uMJaThcjLQ=="
+    }
+  },
+  "workspace": {
+    "dependencies": [
+      "npm:alien-signals@^2.0.5"
+    ]
+  }
+}

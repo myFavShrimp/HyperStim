@@ -1,0 +1,21 @@
+{
+    "compilerOptions": {
+        "lib": ["dom", "dom.iterable", "esnext"],
+        "checkJs": true,
+        "noErrorTruncation": true,
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitReturns": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "noUncheckedIndexedAccess": true
+    },
+    "fmt": {
+        "indentWidth": 4
+    },
+    "tasks": {
+        "bundle": "rm -rf dist && mkdir -p dist && deno bundle src/hyperstim.ts -o dist/hyperstim.js && deno bundle src/hyperstim.ts --minify -o dist/hyperstim.min.js"
+    },
+    "imports": {
+        "alien-signals": "npm:alien-signals@^2.0.5"
+    }
+}
