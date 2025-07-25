@@ -42,11 +42,14 @@ export function runPluginsOnElement(rootElement: Element = document.body) {
                 dataAttributePrefix.length,
             );
 
-            const attributePartsWithoutDataPrefix = attributeWithoutDataPrefix
-                .split(
-                    "-",
-                );
-            const pluginNameOrAlias = attributePartsWithoutDataPrefix[0];
+            const [attributeArgumentsString, ...attributeModifiers] =
+                attributeWithoutDataPrefix.split("__");
+
+            const [pluginNameOrAlias, ...attributeArguments] =
+                (attributeArgumentsString as string)
+                    .split(
+                        "-",
+                    );
 
             if (!pluginNameOrAlias) continue;
 
@@ -56,8 +59,8 @@ export function runPluginsOnElement(rootElement: Element = document.body) {
 
             const cleanup = handleAttribute(
                 element,
-                attributeWithoutDataPrefix,
-                attributePartsWithoutDataPrefix.splice(1),
+                attributeArguments,
+                attributeModifiers,
                 elementAttribute.value,
             );
 

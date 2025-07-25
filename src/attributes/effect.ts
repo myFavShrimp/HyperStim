@@ -9,8 +9,8 @@ import { buildHyperStimEvaluationFn } from "../hyperstim.ts";
  */
 export function handleEffectAttribute(
     element: Element,
-    _rawKey: string,
-    _keyParts: string[],
+    _attributeArguments: string[],
+    _attributeModifiers: string[],
     attributeValue: string,
 ) {
     const attributeEvaluationFn = buildHyperStimEvaluationFn(

@@ -10,8 +10,8 @@ import { buildHyperStimEvaluationFn } from "../hyperstim.ts";
 // signals when they already exist.
 export function handleSignalsAttribute(
     element: Element,
-    _rawKey: string,
-    keyParts: string[],
+    attributeArguments: string[],
+    _attributeModifiers: string[],
     attributeValue: string,
 ) {
     const createSignalOrSkipIfExists = <T>(name: string, value: T) => {
@@ -27,8 +27,8 @@ export function handleSignalsAttribute(
         [],
     );
 
-    if (keyParts.length > 0) {
-        const signalName = toCamelCase(keyParts);
+    if (attributeArguments.length > 0) {
+        const signalName = toCamelCase(attributeArguments);
         const initialValue = attributeEvaluationFn();
 
         createSignalOrSkipIfExists(signalName, initialValue);

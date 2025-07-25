@@ -8,17 +8,17 @@ import { buildHyperStimEvaluationFn } from "../hyperstim.ts";
  */
 export function handleComputedAttribute(
     element: Element,
-    _rawKey: string,
-    keyParts: string[],
+    attributeArguments: string[],
+    _attributeModifiers: string[],
     attributeValue: string,
 ) {
-    if (keyParts.length === 0) {
+    if (attributeArguments.length === 0) {
         console.error(
             "HyperStim ERROR: 'computed' plugin requires signal name, e.g. data-computed-something",
         );
     }
 
-    const name = toCamelCase(keyParts);
+    const name = toCamelCase(attributeArguments);
 
     if (typeof globalThis.HyperStim!.signals[name] === "function") return;
 

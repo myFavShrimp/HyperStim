@@ -2,18 +2,18 @@ import { buildHyperStimEvaluationFn } from "../hyperstim.ts";
 
 export function handleOnAttribute(
     element: Element,
-    _rawKey: string,
-    keyParts: string[],
+    attributeArguments: string[],
+    _attributeModifiers: string[],
     attributeValue: string,
 ) {
-    if (keyParts.length === 0) {
+    if (attributeArguments.length === 0) {
         console.error(
             "HyperStim ERROR: 'on' plugin requires event name, e.g. data-on-click",
         );
         return;
     }
 
-    const eventName = keyParts.join("-");
+    const eventName = attributeArguments.join("-");
 
     const attributeEvaluationFn = buildHyperStimEvaluationFn(
         attributeValue.trim(),

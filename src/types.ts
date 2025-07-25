@@ -31,7 +31,7 @@ export type AttributeEvaluationFn = <T = unknown>(...params: unknown[]) => T;
 
 export type AttributeHandler = (
     element: Element,
-    rawKey: string,
-    keyParts: string[],
+    attributeArguments: string[],
+    attributeModifier: string[],
     attributeValue: string,
 ) => void | CleanupFn;

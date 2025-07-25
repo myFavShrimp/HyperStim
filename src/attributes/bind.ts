@@ -49,8 +49,8 @@ function write(
 
 export function handleBindAtribute(
     element: Element,
-    _rawKey: string,
-    _keyParts: string[],
+    _attributeArguments: string[],
+    _attributeModifiers: string[],
     attributeValue: string,
 ) {
     const propertyKey = defaultProperty(element);
