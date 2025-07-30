@@ -35,3 +35,6 @@ export type AttributeHandler = (
     attributeModifier: string[],
     attributeValue: string,
 ) => void | CleanupFn;
+
+// deno-lint-ignore no-explicit-any
+export type AnyFunction = (...args: any[]) => unknown;
