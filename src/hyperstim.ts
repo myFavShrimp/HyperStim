@@ -28,7 +28,9 @@ type ExtendedElement = {
     __hyperstim_cleanup?: CleanupFn[];
 };
 
-export function runPluginsOnElement(rootElement: Element = document.body) {
+export function runPluginsOnElement(
+    rootElement: Element = document.documentElement,
+) {
     const elements: Element[] = [
         rootElement,
         ...rootElement.querySelectorAll("*"),
