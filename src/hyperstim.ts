@@ -111,9 +111,9 @@ function runCleanupOnElement(rootElement: Element) {
     ];
 
     for (const target of cleanupTargets) {
-        const extended = target as ExtendedElement;
+        const extendedElement = target as ExtendedElement;
 
-        const cleanupFns = extended.__hyperstim_cleanup;
+        const cleanupFns = extendedElement.__hyperstim_cleanup;
 
         if (!cleanupFns) continue;
 
@@ -125,7 +125,7 @@ function runCleanupOnElement(rootElement: Element) {
             }
         }
 
-        extended.__hyperstim_cleanup = [];
+        extendedElement.__hyperstim_cleanup = [];
     }
 }
 

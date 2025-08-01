@@ -4,24 +4,25 @@ import { ReadSignal } from "../types.ts";
 import { parseMode, patchElements, resolveTarget } from "../dom.ts";
 import { buildHyperStimEvaluationFn } from "../hyperstim.ts";
 
-type State = "pending" | "success" | "error";
+type State = "initial" | "pending" | "success" | "error";
 type Progress = {
     loaded: number;
     total: number | undefined;
     percent: number | undefined;
 };
-type RequestState = {
+type FetchAction = {
     state: ReadSignal<State>;
     error: ReadSignal<unknown> | undefined;
     uploadProgress: ReadSignal<Progress>;
     downloadProgress: ReadSignal<Progress>;
+    trigger: () => Promise<void>;
 };
 
 export function fetch(
     resource: RequestInfo | URL,
     options: XHRFetchOptions = {},
-): RequestState {
-    const stateSignal = signal<State>("pending");
+): FetchAction {
+    const stateSignal = signal<State>("initial");
     const errorSignal = signal<unknown>(undefined);
 
     const uploadProgressSignal = signal<Progress>({
@@ -35,16 +36,15 @@ export function fetch(
         percent: undefined,
     });
 
-    (async () => {
+    const trigger = async () => {
         try {
+            stateSignal("pending");
             const response = await xhrFetch(resource, {
                 ...options,
                 onDownloadProgress: (loaded, total, percent) => {
-                    stateSignal("pending");
                     downloadProgressSignal({ loaded, total, percent });
                 },
                 onUploadProgress: (loaded, total, percent) => {
-                    stateSignal("pending");
                     uploadProgressSignal({ loaded, total, percent });
                 },
             });
@@ -56,13 +56,14 @@ export function fetch(
             errorSignal(error);
             stateSignal("error");
         }
-    })();
+    };
 
     return {
         state: () => stateSignal(),
         error: () => errorSignal(),
         uploadProgress: () => uploadProgressSignal(),
         downloadProgress: () => downloadProgressSignal(),
+        trigger,
     };
 }
 
