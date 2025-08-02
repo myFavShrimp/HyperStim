@@ -3,12 +3,13 @@ import { ReadSignal } from "../types.ts";
 import { parseMode, patchElements, resolveTarget } from "../dom.ts";
 import { buildHyperStimEvaluationFn } from "../hyperstim.ts";
 
-export type SSEState = "connecting" | "open" | "error" | "closed";
+export type SSEState = "initial" | "connecting" | "open" | "error" | "closed";
 
-export interface SSEConnection {
+export interface SSEStream {
     state: ReadSignal<SSEState>;
     error: ReadSignal<unknown> | undefined;
     close: () => void;
+    connect: () => SSEStream;
 }
 
 type SseHtmlEventData = {
@@ -19,73 +20,99 @@ type SseHtmlEventData = {
 
 type SseSignalsEventData = SignalsPatchData;
 
-export function sse(url: string, withCredentials = false): SSEConnection {
-    const stateSignal = signal<SSEState>("connecting");
+export function sse(url: string, withCredentials = false): SSEStream {
+    const stateSignal = signal<SSEState>("initial");
     const errorSignal = signal<unknown>(undefined);
 
-    const eventSource = new EventSource(url, { withCredentials });
+    let eventSourceInstance: EventSource | null = null;
 
-    eventSource.addEventListener("open", () => stateSignal("open"));
+    const connectEventSource = () => {
+        const eventSourceState = eventSourceInstance?.readyState;
+        if (
+            eventSourceState !== undefined &&
+            eventSourceState !== EventSource.CLOSED
+        ) {
+            console.log("no conn", eventSourceState);
+            return;
+        }
 
-    eventSource.addEventListener("error", (e) => {
-        errorSignal(e);
-        stateSignal("error");
-        eventSource.close();
-        stateSignal("closed");
-    });
+        eventSourceInstance?.close();
 
-    eventSource.addEventListener("html", (event: MessageEvent) => {
-        try {
-            const eventData: SseHtmlEventData = JSON.parse(event.data);
-            const patchTarget = eventData.patchTarget;
+        const eventSource = new EventSource(url, { withCredentials });
+        eventSourceInstance = eventSource;
 
-            if (!patchTarget) {
-                console.error(
-                    "HyperStim ERROR: received content-type `text/html` but no hs-target header was specified",
-                );
+        eventSource.addEventListener("open", () => stateSignal("open"));
 
-                return;
+        eventSource.addEventListener("error", (e) => {
+            errorSignal(e);
+            stateSignal("error");
+            eventSource.close();
+            stateSignal("closed");
+        });
+
+        eventSource.addEventListener("html", (event: MessageEvent) => {
+            try {
+                const eventData: SseHtmlEventData = JSON.parse(event.data);
+                const patchTarget = eventData.patchTarget;
+
+                if (!patchTarget) {
+                    console.error(
+                        "HyperStim ERROR: received content-type `text/html` but no hs-target header was specified",
+                    );
+
+                    return;
+                }
+
+                const targetElement = resolveTarget(patchTarget);
+
+                const patchMode = parseMode(eventData.patchMode ?? null);
+                const html = eventData.html;
+
+                patchElements(html, targetElement, patchMode);
+            } catch (err) {
+                console.error("HyperStim SSE patch error", err);
             }
+        });
 
-            const targetElement = resolveTarget(patchTarget);
+        eventSource.addEventListener("signals", (event: MessageEvent) => {
+            try {
+                const eventData: SseSignalsEventData = JSON.parse(event.data);
 
-            const patchMode = parseMode(eventData.patchMode ?? null);
-            const html = eventData.html;
+                patchSignals(eventData);
+            } catch (err) {
+                console.error("HyperStim SSE patch error", err);
+            }
+        });
 
-            patchElements(html, targetElement, patchMode);
-        } catch (err) {
-            console.error("HyperStim SSE patch error", err);
-        }
-    });
+        eventSource.addEventListener("javascript", (event: MessageEvent) => {
+            try {
+                buildHyperStimEvaluationFn(
+                    event.data,
+                    { this: event },
+                    [],
+                )();
+            } catch (err) {
+                console.error("HyperStim SSE patch error", err);
+            }
+        });
+    };
 
-    eventSource.addEventListener("signals", (event: MessageEvent) => {
-        try {
-            const eventData: SseSignalsEventData = JSON.parse(event.data);
+    console.log("setup done");
 
-            patchSignals(eventData);
-        } catch (err) {
-            console.error("HyperStim SSE patch error", err);
-        }
-    });
-
-    eventSource.addEventListener("javascript", (event: MessageEvent) => {
-        try {
-            buildHyperStimEvaluationFn(
-                event.data,
-                { this: event },
-                [],
-            )();
-        } catch (err) {
-            console.error("HyperStim SSE patch error", err);
-        }
-    });
-
-    return {
+    const sseStream = {
         state: () => stateSignal(),
         error: () => errorSignal(),
         close: () => {
-            eventSource.close();
+            eventSourceInstance?.close();
             stateSignal("closed");
         },
+        connect: () => {
+            console.debug("connect called");
+            connectEventSource();
+            console.debug("connected");
+            return sseStream;
+        },
     };
+
+    return sseStream;
 }
