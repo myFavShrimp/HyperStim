@@ -36,5 +36,7 @@ export type AttributeHandler = (
     attributeValue: string,
 ) => void | CleanupFn;
 
+export type ElementHandler = (element: Element) => void | CleanupFn;
+
 // deno-lint-ignore no-explicit-any
 export type AnyFunction = (...args: any[]) => unknown;

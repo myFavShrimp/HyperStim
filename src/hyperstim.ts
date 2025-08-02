@@ -1,4 +1,9 @@
-import { AttributeEvaluationFn, AttributeHandler, CleanupFn } from "./types.ts";
+import {
+    AttributeEvaluationFn,
+    AttributeHandler,
+    CleanupFn,
+    ElementHandler,
+} from "./types.ts";
 import { handleSignalsAttribute } from "./attributes/signals.ts";
 import { handleBindAtribute } from "./attributes/bind.ts";
 import { handleOnAttribute } from "./attributes/on.ts";
@@ -6,6 +11,7 @@ import { handleEffectAttribute } from "./attributes/effect.ts";
 import { handleComputedAttribute } from "./attributes/computed.ts";
 import { fetch } from "./actions/fetch.ts";
 import { sse } from "./actions/sse.ts";
+import { handleFormElement } from "./elements/form.ts";
 
 globalThis.HyperStim ??= {
     signals: {},
@@ -23,10 +29,70 @@ const attributeHandlers: Record<string, AttributeHandler> = {
     "on": handleOnAttribute,
     "signals": handleSignalsAttribute,
 };
+const elementHandlers: Record<string, ElementHandler> = {
+    "FORM": handleFormElement,
+};
 
 type ExtendedElement = {
     __hyperstim_cleanup?: CleanupFn[];
 };
+
+function processDataAttributes(element: Element) {
+    for (const elementAttribute of element.attributes) {
+        if (!elementAttribute.name.startsWith("data-")) continue;
+
+        const attributeWithoutDataPrefix = elementAttribute.name.substring(
+            dataAttributePrefix.length,
+        );
+
+        const [attributeArgumentsString, ...attributeModifiers] =
+            attributeWithoutDataPrefix.split("__");
+
+        const [pluginNameOrAlias, ...attributeArguments] =
+            (attributeArgumentsString as string)
+                .split(
+                    "-",
+                );
+
+        if (!pluginNameOrAlias) continue;
+
+        const handleAttribute = attributeHandlers[pluginNameOrAlias];
+
+        if (!handleAttribute) continue;
+
+        const cleanup = handleAttribute(
+            element,
+            attributeArguments,
+            attributeModifiers,
+            elementAttribute.value,
+        );
+
+        if (cleanup) {
+            const extendedElement = element as ExtendedElement;
+
+            const elementCleanupList = extendedElement.__hyperstim_cleanup ??
+                [];
+            elementCleanupList.push(cleanup);
+            extendedElement.__hyperstim_cleanup = elementCleanupList;
+        }
+    }
+}
+
+function processNodesByName(element: Element) {
+    const elementHandler = elementHandlers[element.nodeName];
+
+    if (!elementHandler) return;
+
+    const cleanup = elementHandler(element);
+
+    if (cleanup) {
+        const extendedElement = element as ExtendedElement;
+
+        const elementCleanupList = extendedElement.__hyperstim_cleanup ?? [];
+        elementCleanupList.push(cleanup);
+        extendedElement.__hyperstim_cleanup = elementCleanupList;
+    }
+}
 
 export function runPluginsOnElement(
     rootElement: Element = document.documentElement,
@@ -37,44 +103,8 @@ export function runPluginsOnElement(
     ];
 
     for (const element of elements) {
-        for (const elementAttribute of element.attributes) {
-            if (!elementAttribute.name.startsWith("data-")) continue;
-
-            const attributeWithoutDataPrefix = elementAttribute.name.substring(
-                dataAttributePrefix.length,
-            );
-
-            const [attributeArgumentsString, ...attributeModifiers] =
-                attributeWithoutDataPrefix.split("__");
-
-            const [pluginNameOrAlias, ...attributeArguments] =
-                (attributeArgumentsString as string)
-                    .split(
-                        "-",
-                    );
-
-            if (!pluginNameOrAlias) continue;
-
-            const handleAttribute = attributeHandlers[pluginNameOrAlias];
-
-            if (!handleAttribute) continue;
-
-            const cleanup = handleAttribute(
-                element,
-                attributeArguments,
-                attributeModifiers,
-                elementAttribute.value,
-            );
-
-            if (cleanup) {
-                const extendedElement = element as ExtendedElement;
-
-                const elementCleanupList: (() => void)[] =
-                    extendedElement.__hyperstim_cleanup ?? [];
-                elementCleanupList.push(cleanup);
-                extendedElement.__hyperstim_cleanup = elementCleanupList;
-            }
-        }
+        processDataAttributes(element);
+        processNodesByName(element);
     }
 }
 

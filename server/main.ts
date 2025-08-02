@@ -51,6 +51,19 @@ async function handler(req: Request): Promise<Response> {
     });
   }
 
+  if (url.pathname === "/form") {
+    const htmlContent =
+      '<h1 data-signal-test="0" data-effect="console.log(test())" data-effect="test(test() + 1)">IT WORKS!</h1><h1 data-signal-counter="0" data-effect="this.textContent = counter()"></h1> <button data-on-click="counter(counter() - 1)">-1</button> <button data-on-click="counter(counter() + 1)">+1</button>';
+
+    return new Response(htmlContent, {
+      headers: {
+        "content-type": "text/html",
+        "hs-target": "#test-id",
+        "hs-mode": "after",
+      },
+    });
+  }
+
   try {
     const response = await serveDir(req, {
       fsRoot: "..",

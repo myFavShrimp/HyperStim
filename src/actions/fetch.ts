@@ -10,7 +10,7 @@ type Progress = {
     total: number | undefined;
     percent: number | undefined;
 };
-type FetchAction = {
+export type FetchAction = {
     state: ReadSignal<State>;
     error: ReadSignal<unknown> | undefined;
     uploadProgress: ReadSignal<Progress>;
