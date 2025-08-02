@@ -1,6 +1,6 @@
 import { xhrFetch, XHRFetchOptions } from "../xhr-fetch.ts";
 import { patchSignals, signal, SignalsPatchData } from "../signals.ts";
-import { ReadSignal } from "../types.ts";
+import { ReadSignal, ReadWriteSignal } from "../types.ts";
 import { parseMode, patchElements, resolveTarget } from "../dom.ts";
 import { buildHyperStimEvaluationFn } from "../hyperstim.ts";
 
@@ -15,7 +15,9 @@ export type FetchAction = {
     error: ReadSignal<unknown> | undefined;
     uploadProgress: ReadSignal<Progress>;
     downloadProgress: ReadSignal<Progress>;
-    trigger: () => Promise<void>;
+    options: ReadWriteSignal<XHRFetchOptions>;
+    resource: ReadWriteSignal<RequestInfo | URL>;
+    trigger: () => FetchAction;
 };
 
 export function fetch(
@@ -24,6 +26,8 @@ export function fetch(
 ): FetchAction {
     const stateSignal = signal<State>("initial");
     const errorSignal = signal<unknown>(undefined);
+    const optionsSignal = signal<XHRFetchOptions>(options);
+    const resourceSignal = signal<RequestInfo | URL>(resource);
 
     const uploadProgressSignal = signal<Progress>({
         loaded: 0,
@@ -36,11 +40,13 @@ export function fetch(
         percent: undefined,
     });
 
-    const trigger = async () => {
+    const triggerFetch = async () => {
         try {
             stateSignal("pending");
-            const response = await xhrFetch(resource, {
-                ...options,
+            const currentPayload = optionsSignal();
+            const currentResource = resourceSignal();
+            const response = await xhrFetch(currentResource, {
+                ...currentPayload,
                 onDownloadProgress: (loaded, total, percent) => {
                     downloadProgressSignal({ loaded, total, percent });
                 },
@@ -58,13 +64,20 @@ export function fetch(
         }
     };
 
-    return {
+    const action = {
         state: () => stateSignal(),
         error: () => errorSignal(),
         uploadProgress: () => uploadProgressSignal(),
         downloadProgress: () => downloadProgressSignal(),
-        trigger,
+        options: optionsSignal,
+        resource: resourceSignal,
+        trigger: () => {
+            triggerFetch();
+            return action;
+        },
     };
+
+    return action;
 }
 
 async function processResponse(response: Response) {

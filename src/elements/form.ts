@@ -16,14 +16,15 @@ export function handleFormElement(
 
     const action = form.action || globalThis.location.href;
     const method = (form.method || "GET").toUpperCase();
-    
+
     form.__hyperstim_action = fetch(action, { method });
 
     const submitHandler = (event: SubmitEvent) => {
         event.preventDefault();
 
         const formData = new FormData(form);
-        const enctype = form.enctype || "application/x-www-form-urlencoded";
+        const enctype = form.attributes.getNamedItem("enctype")?.nodeValue ||
+            form.enctype || "application/x-www-form-urlencoded";
 
         let body: BodyInit | undefined;
         const headers: Record<string, string> = {};
@@ -38,7 +39,8 @@ export function handleFormElement(
             const url = new URL(action);
             url.search = searchParams.toString();
 
-            form.__hyperstim_action = fetch(url.toString(), { method });
+            form.__hyperstim_action?.resource(url.toString());
+            form.__hyperstim_action?.options({ method });
         } else {
             if (enctype === "multipart/form-data") {
                 body = formData;
@@ -62,18 +64,17 @@ export function handleFormElement(
                 headers["Content-Type"] = "application/x-www-form-urlencoded";
             }
 
-            form.__hyperstim_action = fetch(action, {
+            form.__hyperstim_action?.options({
                 method,
                 body,
                 headers,
             });
         }
 
-        form.__hyperstim_action.trigger();
+        form.__hyperstim_action?.trigger();
     };
 
     form.addEventListener("submit", submitHandler);
-    form.setAttribute("data-hyperstim-hijacked", "true");
 
     return () => {
         form.removeEventListener("submit", submitHandler);

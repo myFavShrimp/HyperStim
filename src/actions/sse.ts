@@ -107,9 +107,7 @@ export function sse(url: string, withCredentials = false): SSEStream {
             stateSignal("closed");
         },
         connect: () => {
-            console.debug("connect called");
             connectEventSource();
-            console.debug("connected");
             return sseStream;
         },
     };
