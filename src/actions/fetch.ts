@@ -50,11 +50,31 @@ export function fetch(
             const currentResource = resourceSignal();
             const response = await xhrFetch(currentResource, {
                 ...currentPayload,
-                onDownloadProgress: (loaded, total, percent, lengthComputable) => {
-                    downloadProgressSignal({ loaded, total, percent, lengthComputable });
+                onDownloadProgress: (
+                    loaded,
+                    total,
+                    percent,
+                    lengthComputable,
+                ) => {
+                    downloadProgressSignal({
+                        loaded,
+                        total,
+                        percent,
+                        lengthComputable,
+                    });
                 },
-                onUploadProgress: (loaded, total, percent, lengthComputable) => {
-                    uploadProgressSignal({ loaded, total, percent, lengthComputable });
+                onUploadProgress: (
+                    loaded,
+                    total,
+                    percent,
+                    lengthComputable,
+                ) => {
+                    uploadProgressSignal({
+                        loaded,
+                        total,
+                        percent,
+                        lengthComputable,
+                    });
                 },
             });
 
@@ -86,50 +106,40 @@ export function fetch(
 async function processResponse(response: Response) {
     const contentType = response.headers.get("content-type");
 
-    switch (contentType) {
-        case "text/html": {
-            const patchTarget = response.headers.get("hs-target");
+    if (contentType?.includes("text/html")) {
+        const patchTarget = response.headers.get("hs-target");
 
-            if (!patchTarget) {
-                console.error(
-                    "HyperStim ERROR: received content-type `text/html` but no hs-target header was specified",
-                );
-
-                break;
-            }
-
-            const targetElement = resolveTarget(patchTarget);
-
-            const patchMode = parseMode(response.headers.get("hs-mode"));
-            const responseText = await response.text();
-
-            patchElements(responseText, targetElement, patchMode);
-
-            break;
-        }
-        case "application/json": {
-            const signalsData: SignalsPatchData = await response.json();
-
-            patchSignals(signalsData);
-
-            break;
-        }
-        case "text/javascript": {
-            const clonedResponse = response.clone();
-            const expression = await response.text();
-
-            buildHyperStimEvaluationFn(
-                expression,
-                { this: clonedResponse },
-                [],
-            )();
-
-            break;
-        }
-        default:
+        if (!patchTarget) {
             console.error(
-                "HyperStim ERROR: received unknown response content-type",
-                contentType,
+                "HyperStim ERROR: received content-type `text/html` but no hs-target header was specified",
             );
+
+            return;
+        }
+
+        const targetElement = resolveTarget(patchTarget);
+
+        const patchMode = parseMode(response.headers.get("hs-mode"));
+        const responseText = await response.text();
+
+        patchElements(responseText, targetElement, patchMode);
+    } else if (contentType?.includes("application/json")) {
+        const signalsData: SignalsPatchData = await response.json();
+
+        patchSignals(signalsData);
+    } else if (contentType?.includes("text/javascript")) {
+        const clonedResponse = response.clone();
+        const expression = await response.text();
+
+        buildHyperStimEvaluationFn(
+            expression,
+            { this: clonedResponse },
+            [],
+        )();
+    } else {
+        console.error(
+            "HyperStim ERROR: received unknown response content-type",
+            contentType,
+        );
     }
 }
