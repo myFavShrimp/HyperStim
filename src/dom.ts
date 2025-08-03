@@ -12,7 +12,7 @@
 //
 // Call handleServerSwap(html, headers) with the raw HTML text and Response.headers.
 
-export type PatchMode = "inner" | "outer" | "before" | "after" | "append";
+export type PatchMode = "inner" | "outer" | "before" | "after" | "append" | "prepend";
 
 export function parseMode(raw: string | null): PatchMode {
     switch (raw) {
@@ -20,6 +20,7 @@ export function parseMode(raw: string | null): PatchMode {
         case "before":
         case "after":
         case "append":
+        case "prepend":
             return raw as PatchMode;
         default:
             return "inner";
