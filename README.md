@@ -89,10 +89,11 @@ HyperStim automatically processes responses based on `Content-Type`.
 Control DOM patching with headers.
 
 - `hs-target`: CSS selector for the target element
-- `hs-mode`: How to patch the content (`replace`, `append`, `prepend`, `before`, `after`)
+- `hs-mode`: How to patch the content (`inner`, `outer`, `append`, `prepend`, `before`, `after`)
 
 ##### Patch Modes
-- `replace`: Replace element content
+- `inner`: Replace element content (default)
+- `outer`: Replace the entire element
 - `append`: Append to element content  
 - `prepend`: Prepend to element content
 - `before`: Insert before the element

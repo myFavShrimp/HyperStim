@@ -2,10 +2,6 @@ import { computed } from "../signals.ts";
 import { toCamelCase } from "../case-conversion.ts";
 import { buildHyperStimEvaluationFn } from "../hyperstim.ts";
 
-/*
- * data-computed-<name>="expression" – creates computed signal `<name>()`.
- * Example: <div data-computed-total="price()*qty()"></div>
- */
 export function handleComputedAttribute(
     element: Element,
     attributeArguments: string[],
