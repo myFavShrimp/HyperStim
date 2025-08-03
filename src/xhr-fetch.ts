@@ -7,8 +7,9 @@
 
 export type ProgressCallback = (
     loaded: number,
-    total?: number,
-    percent?: number,
+    total: number,
+    percent: number,
+    lengthComputable: boolean,
 ) => void;
 
 export interface XHRFetchOptions extends RequestInit {
@@ -100,18 +101,32 @@ export function xhrFetch(
         if (typeof options.onDownloadProgress === "function") {
             xhr.addEventListener("progress", (e) => {
                 const loaded = e.loaded;
-                const total = e.lengthComputable ? e.total : undefined;
-                const percent = total ? (loaded / total) * 100 : undefined;
-                options.onDownloadProgress!(loaded, total, percent);
+                const total = e.total;
+                const percent = (loaded / total) * 100;
+                const lengthComputable = e.lengthComputable;
+
+                options.onDownloadProgress!(
+                    loaded,
+                    total,
+                    percent,
+                    lengthComputable,
+                );
             });
         }
 
         if (typeof options.onUploadProgress === "function" && xhr.upload) {
             xhr.upload.addEventListener("progress", (e) => {
                 const loaded = e.loaded;
-                const total = e.lengthComputable ? e.total : undefined;
-                const percent = total ? (loaded / total) * 100 : undefined;
-                options.onUploadProgress!(loaded, total, percent);
+                const total = e.total;
+                const percent = (loaded / total) * 100;
+                const lengthComputable = e.lengthComputable;
+
+                options.onUploadProgress!(
+                    loaded,
+                    total,
+                    percent,
+                    lengthComputable,
+                );
             });
         }
 

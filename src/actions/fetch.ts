@@ -9,6 +9,7 @@ type Progress = {
     loaded: number;
     total: number | undefined;
     percent: number | undefined;
+    lengthComputable: boolean;
 };
 export type FetchAction = {
     state: ReadSignal<State>;
@@ -33,11 +34,13 @@ export function fetch(
         loaded: 0,
         total: undefined,
         percent: undefined,
+        lengthComputable: false,
     });
     const downloadProgressSignal = signal<Progress>({
         loaded: 0,
         total: undefined,
         percent: undefined,
+        lengthComputable: false,
     });
 
     const triggerFetch = async () => {
@@ -47,11 +50,11 @@ export function fetch(
             const currentResource = resourceSignal();
             const response = await xhrFetch(currentResource, {
                 ...currentPayload,
-                onDownloadProgress: (loaded, total, percent) => {
-                    downloadProgressSignal({ loaded, total, percent });
+                onDownloadProgress: (loaded, total, percent, lengthComputable) => {
+                    downloadProgressSignal({ loaded, total, percent, lengthComputable });
                 },
-                onUploadProgress: (loaded, total, percent) => {
-                    uploadProgressSignal({ loaded, total, percent });
+                onUploadProgress: (loaded, total, percent, lengthComputable) => {
+                    uploadProgressSignal({ loaded, total, percent, lengthComputable });
                 },
             });
 

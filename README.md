@@ -70,8 +70,8 @@ The fetch action returns an object with the following properties:
 
 - `state()`: Returns current state (`initial`, `pending`, `success`, `error`)
 - `error()`: Returns error details when state is `error`
-- `uploadProgress()`: Returns upload progress `{ loaded, total, percent }`
-- `downloadProgress()`: Returns download progress `{ loaded, total, percent }`
+- `uploadProgress()`: Returns upload progress `{ loaded, total, percent, lengthComputable }`
+- `downloadProgress()`: Returns download progress `{ loaded, total, percent, lengthComputable }`
 - `options(newOptions)`: Get/set request options (method, headers, body, etc.)
 - `resource(newUrl)`: Get/set the request URL
 - `trigger()`: Execute the request and return the action object
