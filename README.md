@@ -30,7 +30,7 @@ Signals are automatically created and made available globally, so `data-signals-
 
 ## Actions
 
-### Fetch Action
+### Fetch
 
 Perform HTTP requests with built-in progress tracking and response handling.
 
@@ -57,24 +57,24 @@ Perform HTTP requests with built-in progress tracking and response handling.
   - `timeout`: Request timeout in milliseconds
   - Plus other standard fetch options
 
-#### State
-
-- `initial`: Action created but not yet triggered
-- `pending`: Request in progress
-- `success`: Request completed successfully
-- `error`: Request failed (check `error()` for details)
-
 #### Return value
 
 The fetch action returns an object with the following properties:
 
-- `state()`: Returns current state (`initial`, `pending`, `success`, `error`)
+- `state()`: Returns current state of the fetch action
 - `error()`: Returns error details when state is `error`
 - `uploadProgress()`: Returns upload progress `{ loaded, total, percent, lengthComputable }`
 - `downloadProgress()`: Returns download progress `{ loaded, total, percent, lengthComputable }`
 - `options(newOptions)`: Get/set request options (method, headers, body, etc.)
 - `resource(newUrl)`: Get/set the request URL
 - `trigger()`: Execute the request and return the action object
+
+##### State
+
+- `initial`: Action created but not yet triggered
+- `pending`: Request in progress
+- `success`: Request completed successfully
+- `error`: Request failed (check `error()` for details)
 
 #### Response Handling
 
@@ -84,14 +84,14 @@ HyperStim automatically processes responses based on `Content-Type`.
 - `application/json`: Updates signals with the provided data
 - `text/javascript`: Evaluates JavaScript expressions
 
-#### Response Headers
+##### Response Headers
 
 Control DOM patching with headers.
 
 - `hs-target`: CSS selector for the target element
 - `hs-mode`: How to patch the content (`inner`, `outer`, `append`, `prepend`, `before`, `after`)
 
-##### Patch Modes
+###### Patch Modes
 - `inner`: Replace element content (default)
 - `outer`: Replace the entire element
 - `append`: Append to element content  
@@ -134,8 +134,7 @@ The sse action returns an object with the following properties:
 - `connecting`: Attempting to establish connection
 - `open`: Successfully connected and receiving events
 - `error`: Connection failed (check `error()` for details)
-- `closed`: Connection closed (manually or due to error)
-
+- `closed`: Connection closed
 
 #### Supported Event Types
 

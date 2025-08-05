@@ -30,11 +30,8 @@ export function handleFormElement(
         const headers: Record<string, string> = {};
 
         if (method === "GET") {
-            const searchParams = new URLSearchParams();
-
-            for (const [key, value] of formData.entries()) {
-                searchParams.append(key, value.toString());
-            }
+            // deno-lint-ignore no-explicit-any
+            const searchParams = new URLSearchParams(formData as any);
 
             const url = new URL(action);
             url.search = searchParams.toString();
@@ -54,11 +51,8 @@ export function handleFormElement(
                 body = JSON.stringify(jsonData);
                 headers["Content-Type"] = "application/json";
             } else {
-                const searchParams = new URLSearchParams();
-
-                for (const [key, value] of formData.entries()) {
-                    searchParams.append(key, value.toString());
-                }
+                // deno-lint-ignore no-explicit-any
+                const searchParams = new URLSearchParams(formData as any);
 
                 body = searchParams.toString();
                 headers["Content-Type"] = "application/x-www-form-urlencoded";
