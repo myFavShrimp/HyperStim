@@ -19,6 +19,7 @@ export type FetchAction = {
     options: ReadWriteSignal<XHRFetchOptions>;
     resource: ReadWriteSignal<RequestInfo | URL>;
     trigger: () => FetchAction;
+    abort: () => void;
 };
 
 export function fetch(
@@ -29,6 +30,7 @@ export function fetch(
     const errorSignal = signal<unknown>(undefined);
     const optionsSignal = signal<XHRFetchOptions>(options);
     const resourceSignal = signal<RequestInfo | URL>(resource);
+    const abortController = new AbortController();
 
     const uploadProgressSignal = signal<Progress>({
         loaded: 0,
@@ -50,6 +52,7 @@ export function fetch(
             const currentResource = resourceSignal();
             const response = await xhrFetch(currentResource, {
                 ...currentPayload,
+                signal: abortController.signal,
                 onDownloadProgress: (
                     loaded,
                     total,
@@ -97,6 +100,9 @@ export function fetch(
         trigger: () => {
             triggerFetch();
             return action;
+        },
+        abort: () => {
+            abortController.abort();
         },
     };
 
