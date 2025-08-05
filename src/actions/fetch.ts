@@ -7,8 +7,8 @@ import { buildHyperStimEvaluationFn } from "../hyperstim.ts";
 type State = "initial" | "pending" | "success" | "error";
 type Progress = {
     loaded: number;
-    total: number | undefined;
-    percent: number | undefined;
+    total: number;
+    percent: number;
     lengthComputable: boolean;
 };
 export type FetchAction = {
@@ -32,14 +32,14 @@ export function fetch(
 
     const uploadProgressSignal = signal<Progress>({
         loaded: 0,
-        total: undefined,
-        percent: undefined,
+        total: 0,
+        percent: 0,
         lengthComputable: false,
     });
     const downloadProgressSignal = signal<Progress>({
         loaded: 0,
-        total: undefined,
-        percent: undefined,
+        total: 0,
+        percent: 0,
         lengthComputable: false,
     });
 
