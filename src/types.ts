@@ -2,7 +2,7 @@ import { fetch } from "./actions/fetch.ts";
 import { sse } from "./actions/sse.ts";
 
 export type ReadSignal<T> = {
-    (): T | null;
+    (): T;
 };
 
 export type WriteSignal<T> = {
