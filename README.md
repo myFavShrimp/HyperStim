@@ -68,6 +68,7 @@ The fetch action returns an object with the following properties:
 - `options(newOptions)`: Get/set request options (method, headers, body, etc.)
 - `resource(newUrl)`: Get/set the request URL
 - `trigger()`: Execute the request and return the action object
+- `abort()`: Cancel the current request
 
 ##### State
 
@@ -75,6 +76,7 @@ The fetch action returns an object with the following properties:
 - `pending`: Request in progress
 - `success`: Request completed successfully
 - `error`: Request failed (check `error()` for details)
+- `aborted`: Request was cancelled before completion
 
 #### Response Handling
 
@@ -114,17 +116,21 @@ Real-time updates via Server-Sent Events.
 
 #### Parameters
 
-`sse(url, withCredentials)`
+`sse(url, options)`
 
-- `url` (string): The Server-Sent Events endpoint URL
-- `withCredentials` (boolean, optional): Whether to send credentials with the request (default: false)
+- `url` (string|URL): The Server-Sent Events endpoint URL
+- `options` (object, optional): SSE connection options
+  - `openWhenHidden` (boolean): Whether to keep connection open when page is hidden (default: false)
+  - Plus all standard `RequestInit` options (method, headers, credentials, etc.)
 
 #### Return Value
 
 The sse action returns an object with the following properties:
 
-- `state()`: Returns connection state (`initial`, `connecting`, `open`, `error`, `closed`)
+- `state()`: Returns connection state (`initial`, `connecting`, `connected`, `error`, `closed`)
 - `error()`: Returns error details when state is `error`
+- `options(newOptions)`: Get/set SSE connection options
+- `resource(newUrl)`: Get/set the SSE endpoint URL
 - `connect()`: Establish SSE connection and return the action object
 - `close()`: Close the SSE connection
 
@@ -132,7 +138,7 @@ The sse action returns an object with the following properties:
 
 - `initial`: Stream created but not connected
 - `connecting`: Attempting to establish connection
-- `open`: Successfully connected and receiving events
+- `connected`: Successfully connected and receiving events
 - `error`: Connection failed (check `error()` for details)
 - `closed`: Connection closed
 
