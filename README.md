@@ -146,29 +146,29 @@ The sse action returns an object with the following properties:
 
 HyperStim listens for specific SSE event types.
 
-##### `signals`
+##### `hs-signals`
 
 Update signal values.
 
 ```
-event: signals
+event: hs-signals
 data: {"counter": 42, "username": "Alice"}
 ```
 
-##### `html`
+##### `hs-html`
 
 Patch DOM elements.
 
 ```
-event: html
+event: hs-html
 data: {"html": "<p>New content</p>", "patchTarget": "#container", "patchMode": "append"}
 ```
-##### `javascript`
+##### `hs-javascript`
 
 Execute JavaScript expressions.
 
 ```
-event: javascript
+event: hs-javascript
 data: console.log("Hello from SSE!")
 ```
 

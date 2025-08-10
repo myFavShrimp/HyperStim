@@ -201,7 +201,7 @@ async function handleSseResponse(
             (message) => {
                 try {
                     switch (message.event) {
-                        case "html": {
+                        case "hs-html": {
                             const eventData = JSON.parse(message.data);
                             const patchTarget = eventData.patchTarget;
 
@@ -227,12 +227,12 @@ async function handleSseResponse(
                             );
                             break;
                         }
-                        case "signals": {
+                        case "hs-signals": {
                             const eventData = JSON.parse(message.data);
                             patchSignals(eventData);
                             break;
                         }
-                        case "javascript": {
+                        case "hs-javascript": {
                             buildHyperStimEvaluationFn(
                                 message.data,
                                 { this: message },
