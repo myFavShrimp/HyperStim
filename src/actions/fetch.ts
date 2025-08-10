@@ -4,7 +4,7 @@ import { ReadSignal, ReadWriteSignal } from "../types.ts";
 import { parseMode, patchElements, resolveTarget } from "../dom.ts";
 import { buildHyperStimEvaluationFn } from "../hyperstim.ts";
 
-type State = "initial" | "pending" | "success" | "error";
+type State = "initial" | "pending" | "success" | "error" | "aborted";
 type Progress = {
     loaded: number;
     total: number;
@@ -30,7 +30,7 @@ export function fetch(
     const errorSignal = signal<unknown>(undefined);
     const optionsSignal = signal<XHRFetchOptions>(options);
     const resourceSignal = signal<RequestInfo | URL>(resource);
-    const abortController = new AbortController();
+    let abortController: AbortController | undefined;
 
     const uploadProgressSignal = signal<Progress>({
         loaded: 0,
@@ -45,11 +45,15 @@ export function fetch(
         lengthComputable: false,
     });
 
-    const triggerFetch = async () => {
+    const triggerFetchImplementation = async () => {
         try {
+            abortController?.abort();
+            abortController = new AbortController();
+
             stateSignal("pending");
             const currentPayload = optionsSignal();
             const currentResource = resourceSignal();
+
             const response = await xhrFetch(currentResource, {
                 ...currentPayload,
                 signal: abortController.signal,
@@ -85,9 +89,19 @@ export function fetch(
 
             stateSignal("success");
         } catch (error) {
+            if (abortController?.signal.aborted) {
+                stateSignal("aborted");
+                return;
+            }
             errorSignal(error);
             stateSignal("error");
         }
+    };
+
+    const detachedTriggerFetch = () => {
+        // Use setTimeout to prevent browser loading indicator
+        // for requests triggered immediately after load.
+        setTimeout(triggerFetchImplementation, 0);
     };
 
     const action = {
@@ -98,11 +112,11 @@ export function fetch(
         options: optionsSignal,
         resource: resourceSignal,
         trigger: () => {
-            triggerFetch();
+            detachedTriggerFetch();
             return action;
         },
         abort: () => {
-            abortController.abort();
+            abortController?.abort();
         },
     };
 
@@ -142,6 +156,10 @@ async function processResponse(response: Response) {
             { this: clonedResponse },
             [],
         )();
+    } else if (contentType?.includes("text/event-stream")) {
+        console.error(
+            "HyperStim ERROR: SSE responses should use the SSE action, not fetch action",
+        );
     } else {
         console.error(
             "HyperStim ERROR: received unknown response content-type",

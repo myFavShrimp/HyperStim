@@ -49,7 +49,7 @@ export function sse(
         lastAbortController?.abort();
 
         if (!document.hidden) {
-            detachedTriggerSSE();
+            connectToSseStream();
         }
     }
 
@@ -65,7 +65,7 @@ export function sse(
         lastAbortController?.abort();
     });
 
-    const triggerSseImplementation = async () => {
+    const connectToSseStream = async () => {
         try {
             stateSignal("connecting");
             const currentAbortController = new AbortController();
@@ -88,7 +88,7 @@ export function sse(
                 if (!currentAbortController?.signal.aborted) {
                     console.error("HyperStim ERROR: SSE stream failed:", error);
                     setTimeout(
-                        triggerSseImplementation,
+                        connectToSseStream,
                         internalRetryIntervalSignal(),
                     );
 
@@ -137,7 +137,7 @@ export function sse(
                 if (!currentAbortController?.signal.aborted) {
                     console.error("HyperStim ERROR: SSE stream failed:", error);
                     setTimeout(
-                        triggerSseImplementation,
+                        connectToSseStream,
                         internalRetryIntervalSignal(),
                     );
 
@@ -153,19 +153,13 @@ export function sse(
         }
     };
 
-    const detachedTriggerSSE = () => {
-        // Use setTimeout to prevent browser loading indicator
-        // TODO: Is this even necessary for fetch?
-        setTimeout(triggerSseImplementation, 0);
-    };
-
     const action = {
         state: () => stateSignal(),
         error: () => errorSignal(),
         options: optionsSignal,
         resource: resourceSignal,
         connect: () => {
-            detachedTriggerSSE();
+            connectToSseStream();
             return action;
         },
         close: () => {
