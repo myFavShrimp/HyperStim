@@ -35,7 +35,7 @@ export function sse(
     const optionsSignal = signal<SseOptions>(options);
     const resourceSignal = signal<RequestInfo | URL>(resource);
 
-    let userAbortController: AbortController | undefined;
+    let lastAbortController: AbortController | undefined;
 
     const internalRetryIntervalSignal: InternalRetryIntervalSignal = signal(
         DefaultRetryInterval,
@@ -46,7 +46,7 @@ export function sse(
         });
 
     function onVisibilityChange() {
-        userAbortController?.abort();
+        lastAbortController?.abort();
 
         if (!document.hidden) {
             detachedTriggerSSE();
@@ -62,15 +62,16 @@ export function sse(
 
     globalThis.addEventListener("beforeunload", function (_event) {
         // to prevent error logs because stream ends abruptly
-        userAbortController?.abort();
+        lastAbortController?.abort();
     });
 
     const triggerSseImplementation = async () => {
         try {
             stateSignal("connecting");
+            const currentAbortController = new AbortController();
 
-            userAbortController?.abort();
-            userAbortController = new AbortController();
+            lastAbortController?.abort();
+            lastAbortController = currentAbortController;
 
             const currentOptions = optionsSignal();
             const currentResource = resourceSignal();
@@ -84,7 +85,7 @@ export function sse(
             }
 
             const handleConnectionFailure = (error: unknown) => {
-                if (!userAbortController?.signal.aborted) {
+                if (!currentAbortController?.signal.aborted) {
                     console.error("HyperStim ERROR: SSE stream failed:", error);
                     setTimeout(
                         triggerSseImplementation,
@@ -109,7 +110,7 @@ export function sse(
                 response = await fetch(currentResource, {
                     ...currentOptions,
                     headers,
-                    signal: userAbortController.signal,
+                    signal: currentAbortController.signal,
                     openWhenHidden: undefined,
                 } as RequestInit);
             } catch (error) {
@@ -133,7 +134,7 @@ export function sse(
                     internalAdditionalHeadersSignal,
                 );
             } catch (error) {
-                if (!userAbortController?.signal.aborted) {
+                if (!currentAbortController?.signal.aborted) {
                     console.error("HyperStim ERROR: SSE stream failed:", error);
                     setTimeout(
                         triggerSseImplementation,
@@ -169,7 +170,7 @@ export function sse(
         },
         close: () => {
             removeVisibilityChangeListener();
-            userAbortController?.abort();
+            lastAbortController?.abort();
         },
     };
 

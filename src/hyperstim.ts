@@ -94,7 +94,7 @@ function processNodesByName(element: Element) {
     }
 }
 
-export function runPluginsOnElement(
+export function processElement(
     rootElement: Element = document.documentElement,
 ) {
     const elements: Element[] = [
@@ -114,7 +114,7 @@ function initializeDomObserver() {
             for (const addedNode of record.addedNodes) {
                 if (addedNode.nodeType !== Node.ELEMENT_NODE) continue;
 
-                runPluginsOnElement(addedNode as Element);
+                processElement(addedNode as Element);
             }
 
             for (const removedNode of record.removedNodes) {
@@ -215,12 +215,12 @@ if (typeof document !== "undefined") {
         document.addEventListener(
             "DOMContentLoaded",
             () => {
-                runPluginsOnElement();
+                processElement();
                 initializeDomObserver();
             },
         );
     } else {
-        runPluginsOnElement();
+        processElement();
         initializeDomObserver();
     }
 }
