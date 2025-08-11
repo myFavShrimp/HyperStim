@@ -35,7 +35,8 @@ export function sse(
     const optionsSignal = signal<SseOptions>(options);
     const resourceSignal = signal<RequestInfo | URL>(resource);
 
-    let lastAbortController: AbortController | undefined;
+    let closeLastConnection: () => void | undefined;
+    // let lastAbortController: AbortController | undefined;
 
     const internalRetryIntervalSignal: InternalRetryIntervalSignal = signal(
         DefaultRetryInterval,
@@ -46,7 +47,7 @@ export function sse(
         });
 
     function onVisibilityChange() {
-        lastAbortController?.abort();
+        closeLastConnection?.();
 
         if (!document.hidden) {
             connectToSseStream();
@@ -62,16 +63,19 @@ export function sse(
 
     globalThis.addEventListener("beforeunload", function (_event) {
         // to prevent error logs because stream ends abruptly
-        lastAbortController?.abort();
+        closeLastConnection?.();
     });
 
     const connectToSseStream = async () => {
         try {
             stateSignal("connecting");
+
             const currentAbortController = new AbortController();
 
-            lastAbortController?.abort();
-            lastAbortController = currentAbortController;
+            closeLastConnection = () => {
+                currentAbortController.abort();
+                stateSignal("closed");
+            };
 
             const currentOptions = optionsSignal();
             const currentResource = resourceSignal();
@@ -94,9 +98,9 @@ export function sse(
 
                     errorSignal(error);
                     stateSignal("error");
-                } else {
-                    stateSignal("closed");
                 }
+
+                // Abortions are handled manually in the abort handler to avoid race conditions
             };
 
             const headers = {
@@ -134,19 +138,8 @@ export function sse(
                     internalAdditionalHeadersSignal,
                 );
             } catch (error) {
-                if (!currentAbortController?.signal.aborted) {
-                    console.error("HyperStim ERROR: SSE stream failed:", error);
-                    setTimeout(
-                        connectToSseStream,
-                        internalRetryIntervalSignal(),
-                    );
-
-                    errorSignal(error);
-                    stateSignal("error");
-                }
+                handleConnectionFailure(error);
             }
-
-            stateSignal("closed");
         } catch (error) {
             errorSignal(error);
             stateSignal("error");
@@ -159,12 +152,13 @@ export function sse(
         options: optionsSignal,
         resource: resourceSignal,
         connect: () => {
+            closeLastConnection?.();
             connectToSseStream();
             return action;
         },
         close: () => {
             removeVisibilityChangeListener();
-            lastAbortController?.abort();
+            closeLastConnection?.();
         },
     };
 
