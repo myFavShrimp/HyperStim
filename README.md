@@ -267,13 +267,24 @@ Event handling supports optional modifiers:
 - **Targeting**: `window`
 - **Effects**: `viewtransition`
 
-## Global Object
+## Expression Context
 
-Signals and actions are accessible programmatically via `globalThis.HyperStim`.
+All data-attribute expressions have access to the functionality exposed in `globalThis.HyperStim`, which is automatically spread into the expression context:
+
+- **Declared signals by name** - From `HyperStim.signals.*` (e.g., `counter()` for a signal declared as `data-signals-counter`)
+- **Action functions** - From `HyperStim.actions.*` (`fetch()`, `sse()`)  
+- **Builtin functions** - From `HyperStim.builtin` (`builtin.signal()`, `builtin.effect()`, `builtin.computed()`)
+
+### Global HyperStim Object
+
+The same functionality is available programmatically via `globalThis.HyperStim`:
 
 - `HyperStim.signals` - Object containing all declared signals
 - `HyperStim.actions.fetch(resource, options)` - Create fetch action
-- `HyperStim.actions.sse(url, withCredentials)` - Create SSE action
+- `HyperStim.actions.sse(url, options)` - Create SSE action
+- `HyperStim.builtin.signal(value)` - Create reactive signal
+- `HyperStim.builtin.effect(fn)` - Create reactive effect
+- `HyperStim.builtin.computed(fn)` - Create computed signal
 
 ### Signal Access
 
@@ -282,3 +293,26 @@ Signals declared with `data-signals-name` and computed signals declared with `da
 ### Action Creation
 
 Actions can be created programmatically and return the same objects documented above with their respective properties and methods.
+
+### Builtin Functions
+
+`HyperStim.builtin` functions create signals, effects, and computed values programmatically:
+
+```javascript
+// Creates a signal
+const count = HyperStim.builtin.signal(0);
+
+// Creates an effect that runs when `count` changes
+const dispose = HyperStim.builtin.effect(() => {
+  console.log('Count is:', count());
+});
+
+// Creates a computed signal
+const doubled = HyperStim.builtin.computed(() => count() * 2);
+
+// Updates the signal
+count(5); // Effect logs: "Count is: 5", doubled() now returns 10
+
+// Disposes the effect to stop it from running
+dispose();
+```

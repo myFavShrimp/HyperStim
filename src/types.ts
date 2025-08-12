@@ -1,5 +1,6 @@
 import { fetch } from "./actions/fetch.ts";
 import { sse } from "./actions/sse.ts";
+import { computed, effect, signal } from "./signals.ts";
 
 export type ReadSignal<T> = {
     (): T;
@@ -22,6 +23,11 @@ declare global {
         actions: {
             fetch: typeof fetch;
             sse: typeof sse;
+        };
+        builtin: {
+            signal: typeof signal;
+            effect: typeof effect;
+            computed: typeof computed;
         };
     } | undefined;
 }

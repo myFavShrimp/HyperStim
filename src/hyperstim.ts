@@ -12,12 +12,18 @@ import { handleComputedAttribute } from "./attributes/computed.ts";
 import { fetch } from "./actions/fetch.ts";
 import { sse } from "./actions/sse.ts";
 import { handleFormElement } from "./elements/form.ts";
+import { computed, effect, signal } from "./signals.ts";
 
 globalThis.HyperStim ??= {
     signals: {},
     actions: {
         fetch,
         sse,
+    },
+    builtin: {
+        signal,
+        effect,
+        computed,
     },
 };
 
@@ -177,13 +183,14 @@ export function buildHyperStimEvaluationFn(
         HyperStim!.actions,
         "HyperStim.actions",
     );
+    const builtinContextSpread = "const builtin = HyperStim.builtin";
 
     return <T = unknown>(...dynamicParameterValues: unknown[]) => {
         try {
             return new Function(
                 ...staticParameterNames,
                 ...dynamicParameterNames,
-                `${signalsContextSpread}; ${actionsContextSpread}; return (${expressionSource});`,
+                `${signalsContextSpread}; ${actionsContextSpread}; ${builtinContextSpread}; return (${expressionSource});`,
             ).call(
                 thisParameter,
                 ...staticParameterValues,
