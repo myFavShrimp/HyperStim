@@ -2,6 +2,18 @@
 
 A hypermedia framework inspired by [datastar](https://data-star.dev) and [HTMX](https://htmx.org), implementing reactive signals and HTML-driven interactions with a minimal footprint.
 
+## Usage
+
+HyperStim uses **reactive signals** to manage state and **data attributes** to define behavior directly in HTML. When a signal is declared, it becomes globally accessible and automatically updates any dependent elements when changed.
+
+The core pattern:
+1. Declare signals with `data-signals-name="value"`
+2. React to changes with `data-effect="expression"`
+3. Bind form inputs with `data-bind="signalName()"`
+4. Handle events with `data-on-event="expression"`
+
+Signals are automatically created and made available globally, so `data-signals-counter="0"` creates a `counter()` function usable anywhere in HTML.
+
 ## Installation
 
 HyperStim encourages self-hosting and does not provide a CDN. Build from source:
@@ -15,18 +27,6 @@ Include HyperStim in HTML:
 ```html
 <script type="module" src="dist/hyperstim.min.js"></script>
 ```
-
-## Usage
-
-HyperStim uses **reactive signals** to manage state and **data attributes** to define behavior directly in HTML. When a signal is declared, it becomes globally accessible and automatically updates any dependent elements when changed.
-
-The core pattern:
-1. Declare signals with `data-signals-name="value"`
-2. React to changes with `data-effect="expression"`
-3. Bind form inputs with `data-bind="signalName()"`
-4. Handle events with `data-on-event="expression"`
-
-Signals are automatically created and made available globally, so `data-signals-counter="0"` creates a `counter()` function usable anywhere in HTML.
 
 ## Actions
 
