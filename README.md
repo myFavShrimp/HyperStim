@@ -175,7 +175,7 @@ data: console.log("Hello from SSE!")
 
 #### Custom Event Handling
 
-For custom SSE events not recognized by HyperStim, use the `onOther` option to provide a handler function:
+Custom SSE events not recognized by HyperStim can be handled using the `onOther` option:
 
 ```html
 <div data-signals-stream="sse('/events', {
