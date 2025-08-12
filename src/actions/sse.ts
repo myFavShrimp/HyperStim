@@ -4,8 +4,11 @@ import { parseMode, patchElements, resolveTarget } from "../dom.ts";
 import { buildHyperStimEvaluationFn } from "../hyperstim.ts";
 import { getBytes, getLines, getMessages } from "../sse.ts";
 
+type UnknownEventHandler = (event: { event: string; data: string }) => void;
+
 export interface SseOptions extends RequestInit {
     openWhenHidden?: boolean;
+    onOther?: UnknownEventHandler;
 }
 
 type State = "initial" | "connecting" | "connected" | "error" | "closed";
@@ -136,6 +139,7 @@ export function sse(
                     response,
                     internalRetryIntervalSignal,
                     internalAdditionalHeadersSignal,
+                    currentOptions.onOther,
                 );
             } catch (error) {
                 handleConnectionFailure(error);
@@ -169,6 +173,7 @@ async function handleSseResponse(
     response: Response,
     retryIntervalSignal: InternalRetryIntervalSignal,
     internalAdditionalHeadersSignal: InternalAdditionalHeadersSignal,
+    onUnknownEvent?: UnknownEventHandler,
 ) {
     const body = response.body;
     if (!body) {
@@ -236,10 +241,18 @@ async function handleSseResponse(
                         }
                         default:
                             if (message.event) {
-                                console.debug(
-                                    "Unknown SSE event type:",
-                                    message.event,
-                                );
+                                onUnknownEvent
+                                    ? setTimeout(
+                                        () =>
+                                            onUnknownEvent({
+                                                event: message.event,
+                                                data: message.data,
+                                            }),
+                                        0,
+                                    )
+                                    : console.warn(
+                                        `Cannot handle unknown SSE event '${message.event}'. No SSE 'onOther' handler was specified.`,
+                                    );
                             }
                     }
                 } catch (err) {

@@ -121,6 +121,7 @@ Real-time updates via Server-Sent Events.
 - `url` (string|URL): The Server-Sent Events endpoint URL
 - `options` (object, optional): SSE connection options
   - `openWhenHidden` (boolean): Whether to keep connection open when page is hidden (default: false)
+  - `onOther` (function): Handler for custom SSE events not recognized by HyperStim
   - Plus all standard `RequestInit` options (method, headers, credentials, etc.)
 
 #### Return Value
@@ -171,6 +172,23 @@ Execute JavaScript expressions.
 event: hs-javascript
 data: console.log("Hello from SSE!")
 ```
+
+#### Custom Event Handling
+
+For custom SSE events not recognized by HyperStim, use the `onOther` option to provide a handler function:
+
+```html
+<div data-signals-stream="sse('/events', {
+  onOther: (event) => {
+    console.log('Received custom event:', event.event, event.data);
+    // Handle custom events here
+  }
+})"></div>
+```
+
+The `onOther` handler receives an object with properties:
+- `event`: The event type name  
+- `data`: The event data as a string
 
 ## Form Hijacking
 
