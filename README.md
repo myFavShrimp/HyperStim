@@ -255,7 +255,7 @@ Handle DOM events with optional modifiers.
 
 `data-on-{event}[__{modifier}]="{expression}"`
 
-Available modifiers: `prevent`, `stop`, `trusted`, `once`, `passive`, `capture`, `outside`, `window`, `viewtransition`, `debounce.{time}`, `throttle.{time}`, `delay.{ms}`
+Available modifiers: `prevent`, `stop`, `trusted`, `once`, `passive`, `capture`, `outside`, `window`, `debounce.{time}`, `throttle.{time}`, `delay.{ms}`
 
 #### Modifiers
 
@@ -265,7 +265,6 @@ Event handling supports optional modifiers:
 - **Conditions**: `trusted`, `once`, `outside`  
 - **Event handling**: `prevent`, `stop`, `passive`, `capture`
 - **Targeting**: `window`
-- **Effects**: `viewtransition`
 
 ## Expression Context
 

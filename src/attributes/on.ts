@@ -68,21 +68,6 @@ export function handleOnAttribute(
         };
     }
 
-    const viewtransitionModifier = extractModifier(
-        attributeModifiers,
-        "viewtransition",
-    );
-
-    if (
-        viewtransitionModifier !== null &&
-        "startViewTransition" in document
-    ) {
-        const originalEventHandler = eventHandler;
-
-        eventHandler = (event) =>
-            document.startViewTransition(() => originalEventHandler(event));
-    }
-
     const isOutsideSpecified = extractModifier(
         attributeModifiers,
         "outside",
