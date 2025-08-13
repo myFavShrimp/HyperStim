@@ -39,7 +39,6 @@ export function sse(
     const resourceSignal = signal<RequestInfo | URL>(resource);
 
     let closeLastConnection: () => void | undefined;
-    // let lastAbortController: AbortController | undefined;
 
     const internalRetryIntervalSignal: InternalRetryIntervalSignal = signal(
         DefaultRetryInterval,
@@ -177,7 +176,7 @@ async function handleSseResponse(
 ) {
     const body = response.body;
     if (!body) {
-        throw new Error("Event stream response has no body");
+        throw new Error("Event stream response has no body.");
     }
 
     await getBytes(

@@ -45,7 +45,7 @@ export function fetch(
         lengthComputable: false,
     });
 
-    const triggerFetchImplementation = async () => {
+    const triggerFetch = async () => {
         try {
             abortController?.abort();
             abortController = new AbortController();
@@ -98,12 +98,6 @@ export function fetch(
         }
     };
 
-    const detachedTriggerFetch = () => {
-        // Use setTimeout to prevent browser loading indicator
-        // for requests triggered immediately after load.
-        setTimeout(triggerFetchImplementation, 0);
-    };
-
     const action = {
         state: () => stateSignal(),
         error: () => errorSignal(),
@@ -112,7 +106,7 @@ export function fetch(
         options: optionsSignal,
         resource: resourceSignal,
         trigger: () => {
-            detachedTriggerFetch();
+            triggerFetch();
             return action;
         },
         abort: () => {

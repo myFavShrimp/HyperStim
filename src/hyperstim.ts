@@ -109,8 +109,12 @@ export function processElement(
     ];
 
     for (const element of elements) {
-        processDataAttributes(element);
-        processNodesByName(element);
+        // The processing is detached to prevent loading spinners on
+        // the tab e.g. when immediately triggering a fetch action.
+        // Processing order is important to ensure signals defined
+        // earlier in html are available on later nodes.
+        queueMicrotask(() => processDataAttributes(element));
+        queueMicrotask(() => processNodesByName(element));
     }
 }
 
