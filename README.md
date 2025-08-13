@@ -274,17 +274,6 @@ All data-attribute expressions have access to the functionality exposed in `glob
 - **Action functions** - From `HyperStim.actions.*` (`fetch()`, `sse()`)  
 - **Builtin functions** - From `HyperStim.builtin` (`builtin.signal()`, `builtin.effect()`, `builtin.computed()`)
 
-### Global HyperStim Object
-
-The same functionality is available programmatically via `globalThis.HyperStim`:
-
-- `HyperStim.signals` - Object containing all declared signals
-- `HyperStim.actions.fetch(resource, options)` - Create fetch action
-- `HyperStim.actions.sse(url, options)` - Create SSE action
-- `HyperStim.builtin.signal(value)` - Create reactive signal
-- `HyperStim.builtin.effect(fn)` - Create reactive effect
-- `HyperStim.builtin.computed(fn)` - Create computed signal
-
 ### Signal Access
 
 Signals declared with `data-signals-name` and computed signals declared with `data-computed-name` become accessible as `HyperStim.signals.name`. Regular signals accept no arguments to read, one argument to write. Computed signals are read-only.
@@ -293,9 +282,16 @@ Signals declared with `data-signals-name` and computed signals declared with `da
 
 Actions can be created programmatically and return the same objects documented above with their respective properties and methods.
 
+- `HyperStim.actions.fetch(resource, options)` - Creates a fetch action
+- `HyperStim.actions.sse(url, options)` - Creates a SSE action
+
 ### Builtin Functions
 
 `HyperStim.builtin` functions create signals, effects, and computed values programmatically:
+
+- `HyperStim.builtin.signal(value)` - Creates reactive signal
+- `HyperStim.builtin.effect(fn)` - Creates reactive effect
+- `HyperStim.builtin.computed(fn)` - Creates computed signal
 
 ```javascript
 // Creates a signal
