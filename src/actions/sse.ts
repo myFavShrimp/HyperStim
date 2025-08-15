@@ -68,13 +68,19 @@ export function sse(
         closeLastConnection?.();
     });
 
-    const connectToSseStream = async () => {
+    const connectToSseStream = async (abortController?: AbortController) => {
         try {
+            if (abortController?.signal.aborted) {
+                return;
+            }
+
             stateSignal("connecting");
 
-            const currentAbortController = new AbortController();
+            const currentAbortController = abortController ??
+                new AbortController();
 
             closeLastConnection = () => {
+                console.debug("closing");
                 currentAbortController.abort();
                 stateSignal("closed");
             };
@@ -91,10 +97,13 @@ export function sse(
             }
 
             const handleConnectionFailure = (error: unknown) => {
+                console.debug(currentAbortController.signal);
                 if (!currentAbortController?.signal.aborted) {
                     console.error("HyperStim ERROR: SSE stream failed:", error);
                     setTimeout(
-                        connectToSseStream,
+                        // Reuse abort controller to cancel the request
+                        // if it has been aborted in the meantime.
+                        () => connectToSseStream(currentAbortController),
                         internalRetryIntervalSignal(),
                     );
 
