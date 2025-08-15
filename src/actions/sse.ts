@@ -68,15 +68,17 @@ export function sse(
         closeLastConnection?.();
     });
 
-    const connectToSseStream = async (abortController?: AbortController) => {
+    const connectToSseStream = async (
+        lastAbortController?: AbortController,
+    ) => {
         try {
-            if (abortController?.signal.aborted) {
+            if (lastAbortController?.signal.aborted) {
                 return;
             }
 
             stateSignal("connecting");
 
-            const currentAbortController = abortController ??
+            const currentAbortController = lastAbortController ??
                 new AbortController();
 
             closeLastConnection = () => {
