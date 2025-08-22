@@ -154,26 +154,49 @@ Both fetch and SSE actions process commands that update signals, patch DOM eleme
 
 #### `hs-patch-signals`
 
-Update signal values.
+Updates signal values. Any properties other than `type` become signal updates.
 
 ```json
-{"type": "hs-patch-signals", "counter": 42, "username": "Alice"}
+{
+  "type": "hs-patch-signals",
+  "counter": 42,
+  "username": "Alice"
+}
 ```
 
 #### `hs-patch-html`
 
-Patch DOM elements.
+Patches DOM elements. Requires `html` content and `patchTarget` CSS selector.
 
 ```json
-{"type": "hs-patch-html", "html": "<p>New content</p>", "patchTarget": "#container", "patchMode": "append"}
+{
+  "type": "hs-patch-html",
+  "html": "<p>New content</p>",
+  "patchTarget": "#container",
+  "patchMode": "append"
+}
 ```
+
+##### Patch Modes
+
+HTML patches support different modes:
+
+- `inner`: Replace element content (default)
+- `outer`: Replace the entire element
+- `append`: Append to element content  
+- `prepend`: Prepend to element content
+- `before`: Insert before the element
+- `after`: Insert after the element
 
 #### `hs-execute`
 
-Execute JavaScript expressions.
+Executes JavaScript expressions. The `code` property contains the JavaScript to run.
 
 ```json
-{"type": "hs-execute", "code": "console.log('Hello from server!');"}
+{
+  "type": "hs-execute",
+  "code": "console.log('Hello from server!')"
+}
 ```
 
 Multiple commands can be sent as an array in fetch responses:
@@ -206,7 +229,7 @@ data: { "html": "<div>Updated</div>", "patchTarget": "#status", "patchMode": "in
 
 #### Custom Command Handling
 
-Custom commands not recognized by HyperStim can be handled using the `onOther` option:
+Custom commands can be handled using the `onOther` option:
 
 ```html
 <div data-signals-api="fetch('/api/data', {
@@ -223,17 +246,6 @@ Custom commands not recognized by HyperStim can be handled using the `onOther` o
   }
 })"></div>
 ```
-
-#### Patch Modes
-
-HTML patches support different modes:
-
-- `inner`: Replace element content (default)
-- `outer`: Replace the entire element
-- `append`: Append to element content  
-- `prepend`: Prepend to element content
-- `before`: Insert before the element
-- `after`: Insert after the element
 
 ## Form Hijacking
 
@@ -300,16 +312,14 @@ Handle DOM events with optional modifiers.
 
 `data-on-{event}[__{modifier}]="{expression}"`
 
-Available modifiers: `prevent`, `stop`, `trusted`, `once`, `passive`, `capture`, `outside`, `window`, `debounce.{time}`, `throttle.{time}`, `delay.{ms}`
-
 #### Modifiers
 
 Event handling supports optional modifiers:
 
-- **Timing**: `debounce.{time}`, `throttle.{time}`, `delay.{ms}`
-- **Conditions**: `trusted`, `once`, `outside`  
-- **Event handling**: `prevent`, `stop`, `passive`, `capture`
-- **Targeting**: `window`
+- **Timing**: `debounce.{time}` (wait for pause), `throttle.{time}` (limit frequency), `delay.{ms}` (postpone execution)
+- **Conditions**: `trusted` (user-initiated only), `once` (fire only once), `outside` (when clicking outside element)  
+- **Event handling**: `prevent` (preventDefault), `stop` (stopPropagation), `passive` (non-blocking), `capture` (capture phase)
+- **Targeting**: `window` (attach to window instead of element)
 
 ## Expression Context
 
