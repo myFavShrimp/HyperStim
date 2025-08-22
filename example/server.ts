@@ -34,25 +34,32 @@ async function handler(req: Request): Promise<Response> {
       </div>
     `;
 
-    // Create response with padding for meaningful chunk sizes
-    const encoder = new TextEncoder();
-    const fullData = encoder.encode(usersHtml);
+    const command = {
+      type: "hs-patch-html",
+      html: usersHtml,
+      patchTarget: "#users-list",
+      patchMode: "replace",
+    };
+
+    const commandJson = JSON.stringify(command);
+    const commandEncoder = new TextEncoder();
+    const commandData = commandEncoder.encode(commandJson);
 
     // Split into 10 chunks for visible progress
-    const numChunks = 10;
-    const chunkSize = Math.ceil(fullData.length / numChunks);
+    const commandChunks = 10;
+    const commandChunkSize = Math.ceil(commandData.length / commandChunks);
 
-    const stream = new ReadableStream({
+    const commandStream = new ReadableStream({
       async start(controller) {
-        for (let i = 0; i < numChunks; i++) {
-          const start = i * chunkSize;
-          const end = Math.min(start + chunkSize, fullData.length);
-          const chunk = fullData.slice(start, end);
+        for (let i = 0; i < commandChunks; i++) {
+          const start = i * commandChunkSize;
+          const end = Math.min(start + commandChunkSize, commandData.length);
+          const chunk = commandData.slice(start, end);
 
           controller.enqueue(chunk);
 
           // Sleep between chunks (except after the last one)
-          if (i < numChunks - 1) {
+          if (i < commandChunks - 1) {
             await new Promise((resolve) => setTimeout(resolve, 300));
           }
         }
@@ -60,12 +67,10 @@ async function handler(req: Request): Promise<Response> {
       },
     });
 
-    return new Response(stream, {
+    return new Response(commandStream, {
       headers: {
-        "Content-Type": "text/html",
-        "Content-Length": fullData.length.toString(),
-        "hs-target": "#users-list",
-        "hs-mode": "replace",
+        "Content-Type": "application/json",
+        "Content-Length": commandData.length.toString(),
         // tell deno to not use compression
         "Cache-Control": "public, no-transform",
       },
@@ -75,10 +80,13 @@ async function handler(req: Request): Promise<Response> {
   if (url.pathname === "/api/counter") {
     const randomNumber = Math.floor(Math.random() * 100);
 
+    const command = {
+      type: "hs-patch-signals",
+      randomCounter: randomNumber,
+    };
+
     return new Response(
-      JSON.stringify({
-        randomCounter: randomNumber,
-      }),
+      JSON.stringify(command),
       {
         headers: { "Content-Type": "application/json" },
       },
@@ -90,7 +98,7 @@ async function handler(req: Request): Promise<Response> {
     const name = formData.get("name");
     const email = formData.get("email");
 
-    return new Response(
+    const html =
       `<div class="p-6 bg-black border-4 border-green-400 transform rotate-1 pop-shadow relative">
       <div class="absolute -top-3 -right-3 bg-green-400 text-black px-3 py-1 comic-border transform rotate-12">
         <span class="font-black text-sm">SUCCESS!</span>
@@ -103,12 +111,20 @@ async function handler(req: Request): Promise<Response> {
       <div class="mt-4 text-center">
         <span class="inline-block bg-yellow-400 text-black px-4 py-2 font-black uppercase comic-border transform -skew-x-6">KAPOW! DATA RECEIVED!</span>
       </div>
-    </div>`,
+    </div>`;
+
+    const command = {
+      type: "hs-patch-html",
+      html: html,
+      patchTarget: "#form-result",
+      patchMode: "replace",
+    };
+
+    return new Response(
+      JSON.stringify(command),
       {
         headers: {
-          "Content-Type": "text/html",
-          "hs-target": "#form-result",
-          "hs-mode": "replace",
+          "Content-Type": "application/json",
         },
       },
     );
@@ -141,7 +157,9 @@ async function handler(req: Request): Promise<Response> {
 
           try {
             // Send counter update
-            controller.enqueue(new TextEncoder().encode("event: hs-patch-signals\n"));
+            controller.enqueue(
+              new TextEncoder().encode("event: hs-patch-signals\n"),
+            );
             controller.enqueue(
               new TextEncoder().encode(`data: {"liveCounter": ${counter}}\n\n`),
             );
@@ -184,7 +202,9 @@ async function handler(req: Request): Promise<Response> {
               patchMode: "prepend",
             };
 
-            controller.enqueue(new TextEncoder().encode("event: hs-patch-html\n"));
+            controller.enqueue(
+              new TextEncoder().encode("event: hs-patch-html\n"),
+            );
             controller.enqueue(
               new TextEncoder().encode(
                 `data: ${JSON.stringify(eventPayload)}\n\n`,
@@ -206,7 +226,9 @@ async function handler(req: Request): Promise<Response> {
                 patchMode: "prepend",
               };
 
-              controller.enqueue(new TextEncoder().encode("event: hs-patch-html\n"));
+              controller.enqueue(
+                new TextEncoder().encode("event: hs-patch-html\n"),
+              );
               controller.enqueue(
                 new TextEncoder().encode(
                   `data: ${JSON.stringify(finalPayload)}\n\n`,
@@ -217,7 +239,7 @@ async function handler(req: Request): Promise<Response> {
               controller.close();
               isConnected = false;
             }
-          } catch (error) {
+          } catch (_error) {
             // Connection was closed, stop the interval
             clearInterval(interval);
             isConnected = false;

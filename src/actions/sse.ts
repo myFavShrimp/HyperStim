@@ -79,7 +79,6 @@ export function sse(
                 new AbortController();
 
             closeLastConnection = () => {
-                console.debug("closing");
                 currentAbortController.abort();
                 stateSignal("closed");
             };
@@ -96,7 +95,6 @@ export function sse(
             }
 
             const handleConnectionFailure = (error: unknown) => {
-                console.debug(currentAbortController.signal);
                 if (!currentAbortController?.signal.aborted) {
                     console.error("HyperStim ERROR: SSE stream failed:", error);
                     setTimeout(
