@@ -55,6 +55,7 @@ Perform HTTP requests with built-in progress tracking and response handling.
   - `headers`: Request headers object
   - `body`: Request body
   - `timeout`: Request timeout in milliseconds
+  - `onOther` (function): Handler for custom [commands](#commands)
   - Plus other standard fetch options
 
 #### Return value
@@ -80,26 +81,16 @@ The fetch action returns an object with the following properties:
 
 #### Response Handling
 
-HyperStim automatically processes responses based on `Content-Type`.
+HyperStim automatically processes JSON responses containing [commands](#commands) that update signals, patch DOM elements, or execute JavaScript.
 
-- `text/html`: Patches DOM elements using `hs-target` and `hs-mode` headers
-- `application/json`: Updates signals with the provided data
-- `text/javascript`: Evaluates JavaScript expressions
+```html
+<div data-signals-api="fetch('/api/data')"></div>
+<button data-on-click="api().trigger()">Load Data</button>
+```
 
-##### Response Headers
-
-Control DOM patching with headers.
-
-- `hs-target`: CSS selector for the target element
-- `hs-mode`: How to patch the content (`inner`, `outer`, `append`, `prepend`, `before`, `after`)
-
-###### Patch Modes
-- `inner`: Replace element content (default)
-- `outer`: Replace the entire element
-- `append`: Append to element content  
-- `prepend`: Prepend to element content
-- `before`: Insert before the element
-- `after`: Insert after the element
+```json
+{"type": "hs-patch-signals", "counter": 42, "username": "Alice"}
+```
 
 ### Server-Sent Events
 
@@ -121,7 +112,7 @@ Real-time updates via Server-Sent Events.
 - `url` (string|URL): The Server-Sent Events endpoint URL
 - `options` (object, optional): SSE connection options
   - `openWhenHidden` (boolean): Whether to keep connection open when page is hidden (default: false)
-  - `onOther` (function): Handler for custom SSE events not recognized by HyperStim
+  - `onOther` (function): Handler for custom [commands](#commands)
   - Plus all standard `RequestInit` options (method, headers, credentials, etc.)
 
 #### Return Value
@@ -143,52 +134,106 @@ The sse action returns an object with the following properties:
 - `error`: Connection failed (check `error()` for details)
 - `closed`: Connection closed
 
-#### Supported Event Types
+#### Event Handling
 
-HyperStim listens for specific SSE event types.
+SSE endpoints send [commands](#commands) as events where the event name determines the command type.
 
-##### `hs-signals`
-
-Update signal values.
+```html
+<div data-signals-stream="sse('/events')"></div>
+<button data-on-click="stream().connect()">Connect</button>
+```
 
 ```
-event: hs-signals
+event: hs-patch-signals
 data: {"counter": 42, "username": "Alice"}
 ```
 
-##### `hs-html`
+### Commands
+
+Both fetch and SSE actions process commands that update signals, patch DOM elements, or execute JavaScript.
+
+#### `hs-patch-signals`
+
+Update signal values.
+
+```json
+{"type": "hs-patch-signals", "counter": 42, "username": "Alice"}
+```
+
+#### `hs-patch-html`
 
 Patch DOM elements.
 
+```json
+{"type": "hs-patch-html", "html": "<p>New content</p>", "patchTarget": "#container", "patchMode": "append"}
 ```
-event: hs-html
-data: {"html": "<p>New content</p>", "patchTarget": "#container", "patchMode": "append"}
-```
-##### `hs-javascript`
+
+#### `hs-execute`
 
 Execute JavaScript expressions.
 
-```
-event: hs-javascript
-data: console.log("Hello from SSE!")
+```json
+{"type": "hs-execute", "code": "console.log('Hello from server!');"}
 ```
 
-#### Custom Event Handling
+Multiple commands can be sent as an array in fetch responses:
 
-Custom SSE events not recognized by HyperStim can be handled using the `onOther` option:
+```json
+[
+  {
+    "type": "hs-patch-signals",
+    "counter": 1
+  },
+  {
+    "type": "hs-patch-html",
+    "html": "<div>Updated</div>",
+    "patchTarget": "#status",
+    "patchMode": "inner"
+  }
+]
+```
+
+For SSE, the command type is specified as the event name:
+
+```
+event: hs-patch-signals
+data: { "counter": 1 }
+
+
+event: hs-patch-html
+data: { "html": "<div>Updated</div>", "patchTarget": "#status", "patchMode": "inner" }
+```
+
+#### Custom Command Handling
+
+Custom commands not recognized by HyperStim can be handled using the `onOther` option:
 
 ```html
+<div data-signals-api="fetch('/api/data', {
+  onOther: (command) => {
+    console.log('Received custom command:', command.type);
+    // ...
+  }
+})"></div>
+
 <div data-signals-stream="sse('/events', {
-  onOther: (event) => {
-    console.log('Received custom event:', event.event, event.data);
-    // Handle custom events here
+  onOther: (command) => {
+    console.log('Received custom command:', command.type);
+    // ...
   }
 })"></div>
 ```
 
-The `onOther` handler receives an object with properties:
-- `event`: The event type name  
-- `data`: The event data as a string
+#### Patch Modes
+
+HTML patches support different modes:
+
+- `inner`: Replace element content (default)
+- `outer`: Replace the entire element
+- `append`: Append to element content  
+- `prepend`: Prepend to element content
+- `before`: Insert before the element
+- `after`: Insert after the element
 
 ## Form Hijacking
 

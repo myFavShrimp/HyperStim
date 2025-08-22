@@ -1,8 +1,15 @@
 import { xhrFetch, XHRFetchOptions } from "../xhr-fetch.ts";
-import { patchSignals, signal, SignalsPatchData } from "../signals.ts";
+import { signal } from "../signals.ts";
 import { ReadSignal, ReadWriteSignal } from "../types.ts";
-import { parseMode, patchElements, resolveTarget } from "../dom.ts";
-import { buildHyperStimEvaluationFn } from "../hyperstim.ts";
+import {
+    AnyServerCommand,
+    processCommand,
+    UnknownCommandHandler,
+} from "../commands.ts";
+
+export interface FetchOptions extends XHRFetchOptions {
+    onOther?: UnknownCommandHandler;
+}
 
 type State = "initial" | "pending" | "success" | "error" | "aborted";
 type Progress = {
@@ -16,7 +23,7 @@ export type FetchAction = {
     error: ReadSignal<unknown> | undefined;
     uploadProgress: ReadSignal<Progress>;
     downloadProgress: ReadSignal<Progress>;
-    options: ReadWriteSignal<XHRFetchOptions>;
+    options: ReadWriteSignal<FetchOptions>;
     resource: ReadWriteSignal<RequestInfo | URL>;
     trigger: () => FetchAction;
     abort: () => void;
@@ -24,11 +31,11 @@ export type FetchAction = {
 
 export function fetch(
     resource: RequestInfo | URL,
-    options: XHRFetchOptions = {},
+    options: FetchOptions = {},
 ): FetchAction {
     const stateSignal = signal<State>("initial");
     const errorSignal = signal<unknown>(undefined);
-    const optionsSignal = signal<XHRFetchOptions>(options);
+    const optionsSignal = signal<FetchOptions>(options);
     const resourceSignal = signal<RequestInfo | URL>(resource);
     let abortController: AbortController | undefined;
 
@@ -51,11 +58,11 @@ export function fetch(
             abortController = new AbortController();
 
             stateSignal("pending");
-            const currentPayload = optionsSignal();
+            const currentOptions = optionsSignal();
             const currentResource = resourceSignal();
 
             const response = await xhrFetch(currentResource, {
-                ...currentPayload,
+                ...currentOptions,
                 signal: abortController.signal,
                 onDownloadProgress: (
                     loaded,
@@ -85,7 +92,7 @@ export function fetch(
                 },
             });
 
-            await processResponse(response);
+            await processResponse(response, currentOptions.onOther);
 
             stateSignal("success");
         } catch (error) {
@@ -117,42 +124,27 @@ export function fetch(
     return action;
 }
 
-async function processResponse(response: Response) {
+type FetchResponse = AnyServerCommand | AnyServerCommand[];
+
+async function processResponse(
+    response: Response,
+    onOUnknownCommand?: UnknownCommandHandler,
+) {
     const contentType = response.headers.get("content-type");
 
-    if (contentType?.includes("text/html")) {
-        const patchTarget = response.headers.get("hs-target");
+    if (contentType?.includes("application/json")) {
+        const responseData: FetchResponse = await response.json();
 
-        if (!patchTarget) {
-            console.error(
-                "HyperStim ERROR: received content-type `text/html` but no hs-target header was specified",
-            );
-
-            return;
+        if (Array.isArray(responseData)) {
+            for (const data of responseData) {
+                processCommand(data, onOUnknownCommand);
+            }
+        } else {
+            processCommand(responseData, onOUnknownCommand);
         }
-
-        const targetElement = resolveTarget(patchTarget);
-
-        const patchMode = parseMode(response.headers.get("hs-mode"));
-        const responseText = await response.text();
-
-        patchElements(responseText, targetElement, patchMode);
-    } else if (contentType?.includes("application/json")) {
-        const signalsData: SignalsPatchData = await response.json();
-
-        patchSignals(signalsData);
-    } else if (contentType?.includes("text/javascript")) {
-        const clonedResponse = response.clone();
-        const expression = await response.text();
-
-        buildHyperStimEvaluationFn(
-            expression,
-            { this: clonedResponse },
-            [],
-        )();
     } else if (contentType?.includes("text/event-stream")) {
         console.error(
-            "HyperStim ERROR: SSE responses should use the SSE action, not fetch action",
+            "HyperStim ERROR: SSE responses should use the SSE action, not fetch action.",
         );
     } else {
         console.error(

@@ -1,14 +1,11 @@
-import { patchSignals, signal } from "../signals.ts";
+import { signal } from "../signals.ts";
 import { ReadSignal, ReadWriteSignal } from "../types.ts";
-import { parseMode, patchElements, resolveTarget } from "../dom.ts";
-import { buildHyperStimEvaluationFn } from "../hyperstim.ts";
 import { getBytes, getLines, getMessages } from "../sse.ts";
-
-type UnknownEventHandler = (event: { event: string; data: string }) => void;
+import { processCommand, UnknownCommandHandler } from "../commands.ts";
 
 export interface SseOptions extends RequestInit {
     openWhenHidden?: boolean;
-    onOther?: UnknownEventHandler;
+    onOther?: UnknownCommandHandler;
 }
 
 type State = "initial" | "connecting" | "connected" | "error" | "closed";
@@ -183,7 +180,7 @@ async function handleSseResponse(
     response: Response,
     retryIntervalSignal: InternalRetryIntervalSignal,
     internalAdditionalHeadersSignal: InternalAdditionalHeadersSignal,
-    onUnknownEvent?: UnknownEventHandler,
+    onUnknownEvent?: UnknownCommandHandler,
 ) {
     const body = response.body;
     if (!body) {
@@ -209,64 +206,37 @@ async function handleSseResponse(
             },
             (message) => {
                 try {
+                    let eventData;
                     switch (message.event) {
-                        case "hs-html": {
-                            const eventData = JSON.parse(message.data);
-                            const patchTarget = eventData.patchTarget;
-
-                            if (!patchTarget) {
-                                console.error(
-                                    "HyperStim ERROR: received html event but no patchTarget was specified",
-                                );
-                                return;
-                            }
-
-                            const targetElement = resolveTarget(
-                                patchTarget,
-                            );
-                            const patchMode = parseMode(
-                                eventData.patchMode ?? null,
-                            );
-                            const html = eventData.html;
-
-                            patchElements(
-                                html,
-                                targetElement,
-                                patchMode,
-                            );
+                        case "hs-patch-html":
+                        case "hs-patch-signals": {
+                            eventData = JSON.parse(message.data);
                             break;
                         }
-                        case "hs-signals": {
-                            const eventData = JSON.parse(message.data);
-                            patchSignals(eventData);
-                            break;
-                        }
-                        case "hs-javascript": {
-                            buildHyperStimEvaluationFn(
-                                message.data,
-                                { this: message },
-                                [],
-                            )();
+                        case "hs-execute": {
+                            eventData = { code: message.data };
                             break;
                         }
                         default:
                             if (message.event) {
-                                onUnknownEvent
-                                    ? setTimeout(
-                                        () =>
-                                            onUnknownEvent({
-                                                event: message.event,
-                                                data: message.data,
-                                            }),
-                                        0,
-                                    )
-                                    : console.warn(
+                                if (onUnknownEvent) {
+                                    eventData = { event: message };
+                                } else {
+                                    console.warn(
                                         `Cannot handle unknown SSE event '${message.event}'. No SSE 'onOther' handler was specified.`,
                                     );
+
+                                    return;
+                                }
                             }
                     }
+
+                    processCommand(
+                        { type: message.event, ...eventData },
+                        onUnknownEvent,
+                    );
                 } catch (err) {
-                    console.warn(
+                    console.error(
                         "HyperStim WARN: SSE message processing error:",
                         err,
                     );

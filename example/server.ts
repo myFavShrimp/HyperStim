@@ -126,7 +126,7 @@ async function handler(req: Request): Promise<Response> {
           patchTarget: "#sse-log",
           patchMode: "replace",
         };
-        controller.enqueue(new TextEncoder().encode("event: hs-html\n"));
+        controller.enqueue(new TextEncoder().encode("event: hs-patch-html\n"));
         controller.enqueue(
           new TextEncoder().encode(`data: ${JSON.stringify(clearPayload)}\n\n`),
         );
@@ -141,7 +141,7 @@ async function handler(req: Request): Promise<Response> {
 
           try {
             // Send counter update
-            controller.enqueue(new TextEncoder().encode("event: hs-signals\n"));
+            controller.enqueue(new TextEncoder().encode("event: hs-patch-signals\n"));
             controller.enqueue(
               new TextEncoder().encode(`data: {"liveCounter": ${counter}}\n\n`),
             );
@@ -184,7 +184,7 @@ async function handler(req: Request): Promise<Response> {
               patchMode: "prepend",
             };
 
-            controller.enqueue(new TextEncoder().encode("event: hs-html\n"));
+            controller.enqueue(new TextEncoder().encode("event: hs-patch-html\n"));
             controller.enqueue(
               new TextEncoder().encode(
                 `data: ${JSON.stringify(eventPayload)}\n\n`,
@@ -206,7 +206,7 @@ async function handler(req: Request): Promise<Response> {
                 patchMode: "prepend",
               };
 
-              controller.enqueue(new TextEncoder().encode("event: hs-html\n"));
+              controller.enqueue(new TextEncoder().encode("event: hs-patch-html\n"));
               controller.enqueue(
                 new TextEncoder().encode(
                   `data: ${JSON.stringify(finalPayload)}\n\n`,
