@@ -166,7 +166,7 @@ Updates signal values. Any properties other than `type` become signal updates.
 
 #### `hs-patch-html`
 
-Patches DOM elements. Requires `html` content and `patchTarget` CSS selector.
+Patches DOM elements. Requires `html` content, `patchTarget` CSS selector, and `patchMode`.
 
 ```json
 {
