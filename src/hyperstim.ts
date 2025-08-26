@@ -9,6 +9,7 @@ import { handleBindAtribute } from "./attributes/bind.ts";
 import { handleOnAttribute } from "./attributes/on.ts";
 import { handleEffectAttribute } from "./attributes/effect.ts";
 import { handleComputedAttribute } from "./attributes/computed.ts";
+import { handleInitAttribute } from "./attributes/init.ts";
 import { fetch } from "./actions/fetch.ts";
 import { sse } from "./actions/sse.ts";
 import { handleFormElement } from "./elements/form.ts";
@@ -32,6 +33,7 @@ const attributeHandlers: Record<string, AttributeHandler> = {
     "bind": handleBindAtribute,
     "computed": handleComputedAttribute,
     "effect": handleEffectAttribute,
+    "init": handleInitAttribute,
     "on": handleOnAttribute,
     "signals": handleSignalsAttribute,
 };

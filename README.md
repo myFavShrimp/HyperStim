@@ -298,6 +298,12 @@ Create derived signals from other signals. When using multiple expressions, only
 
 `data-computed-{name}="{expression1}, {expression2}"`
 
+### `data-init`
+
+Execute expressions once when the element is first processed.
+
+`data-init="{expression}"`
+
 ### `data-bind`
 
 Two-way binding between form controls and signals.
