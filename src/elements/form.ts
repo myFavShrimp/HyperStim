@@ -2,7 +2,7 @@ import { fetch, FetchAction } from "../actions/fetch.ts";
 import { CleanupFn } from "../types.ts";
 
 type ExtendedForm = HTMLFormElement & {
-    __hyperstim_action?: FetchAction;
+    hsFetch?: FetchAction;
 };
 
 export function handleFormElement(
@@ -17,7 +17,7 @@ export function handleFormElement(
     const action = form.action || globalThis.location.href;
     const method = (form.method || "GET").toUpperCase();
 
-    form.__hyperstim_action = fetch(action, { method });
+    form.hsFetch = fetch(action, { method });
 
     const submitHandler = (event: SubmitEvent) => {
         event.preventDefault();
@@ -36,8 +36,8 @@ export function handleFormElement(
             const url = new URL(action);
             url.search = searchParams.toString();
 
-            form.__hyperstim_action?.resource(url.toString());
-            form.__hyperstim_action?.options({ method });
+            form.hsFetch?.resource(url.toString());
+            form.hsFetch?.options({ method });
         } else {
             if (enctype === "multipart/form-data") {
                 body = formData;
@@ -58,14 +58,14 @@ export function handleFormElement(
                 headers["Content-Type"] = "application/x-www-form-urlencoded";
             }
 
-            form.__hyperstim_action?.options({
+            form.hsFetch?.options({
                 method,
                 body,
                 headers,
             });
         }
 
-        form.__hyperstim_action?.trigger();
+        form.hsFetch?.trigger();
     };
 
     form.addEventListener("submit", submitHandler);

@@ -259,7 +259,7 @@ HyperStim automatically hijacks forms with the `data-hijack` attribute, converti
     <button type="submit">Submit</button>
     
     <!-- Monitor form submission state -->
-    <div data-effect="this.textContent = this.form.__hyperstim_action?.state()"></div>
+    <div data-effect="this.textContent = this.form.hsFetch?.state()"></div>
 </form>
 ```
 
@@ -275,7 +275,7 @@ HyperStim automatically hijacks forms with the `data-hijack` attribute, converti
 
 ### Form Action Object
 
-Each hijacked form has a `__hyperstim_action` property that contains a regular fetch action object with all the same properties and methods documented above.
+Each hijacked form has a `hsFetch` property that contains a regular fetch action object with all the same properties and methods documented above.
 
 ## Attributes Reference
 
