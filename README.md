@@ -372,3 +372,12 @@ count(5); // Effect logs: "Count is: 5", doubled() now returns 10
 // Disposes the effect to stop it from running
 dispose();
 ```
+
+## Website
+
+The landing page with interactive demos showcasing all HyperStim features also serves as an example of how to integrate HyperStim with a backend framework. The server is built with [Hono](https://hono.dev) using JSX for server-side rendering, and implements all the API endpoints that the demos interact with.
+
+```bash
+deno task bundle
+deno task website
+```
