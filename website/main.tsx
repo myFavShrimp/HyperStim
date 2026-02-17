@@ -8,7 +8,15 @@ app.get("/", (c) => {
     return c.html(<Home />);
 });
 
-app.get("/hyperstim.js", serveStatic({ path: "../dist/hyperstim.js" }));
+const hyperstimJs = await Deno.readTextFile(
+    new URL("../dist/hyperstim.js", import.meta.url),
+);
+
+app.get("/hyperstim.js", (c) => {
+    return c.text(hyperstimJs, 200, {
+        "Content-Type": "application/javascript",
+    });
+});
 
 app.get("/api/users", (_c) => {
     const usersHtml = `
