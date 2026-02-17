@@ -1,0 +1,23 @@
+{
+    "compilerOptions": {
+        "lib": ["deno.window"],
+        "checkJs": true,
+        "noErrorTruncation": true,
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitReturns": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "noUncheckedIndexedAccess": true,
+        "jsx": "precompile",
+        "jsxImportSource": "hono/jsx"
+    },
+    "fmt": {
+        "indentWidth": 4
+    },
+    "imports": {
+        "hono": "jsr:@hono/hono@^4.9.1"
+    },
+    "tasks": {
+        "start": "deno run --allow-net --allow-read main.tsx"
+    }
+}

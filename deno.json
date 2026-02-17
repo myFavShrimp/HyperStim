@@ -16,6 +16,7 @@
         "bundle": "rm -rf dist && mkdir -p dist && deno bundle src/hyperstim.ts -o dist/hyperstim.js && deno bundle src/hyperstim.ts --minify -o dist/hyperstim.min.js",
         "check": "deno check src/ --all",
         "example": "cd example && deno run --allow-net --allow-read server.ts",
+        "website": "cd website && deno task start",
     },
     "imports": {
         "alien-signals": "npm:alien-signals@^2.0.5"
