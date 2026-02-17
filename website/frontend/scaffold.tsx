@@ -56,10 +56,6 @@ const styles = `
         .pop-shadow {
             box-shadow: 4px 4px 0px #000;
         }
-        .comic-border {
-            border-width: 4px;
-            box-shadow: 0 0 0 1px #fff, 0 0 0 5px #000;
-        }
     }
 `;
 
@@ -81,16 +77,16 @@ export const Scaffold = ({ children }: { children: unknown }) => (
             <body class="bg-black min-h-screen text-white font-bold">
                 <header class="bg-gradient-to-r from-purple-600 via-pink-500 to-red-500 border-b-4 border-yellow-400 halftone-dots">
                     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 relative">
-                        <h1 class="text-4xl sm:text-6xl font-black text-white transform sm:-skew-x-6 neon-glow text-yellow-300 comic-border bg-red-500 px-4 sm:px-6 py-3 sm:py-4 inline-block pop-shadow">
+                        <h1 class="text-4xl sm:text-6xl font-black text-white transform -skew-x-6 neon-glow text-yellow-300 comic-border bg-red-500 px-4 sm:px-6 py-3 sm:py-4 inline-block pop-shadow">
                             HYPERSTIM
                         </h1>
-                        <div class="bg-yellow-400 text-black px-4 sm:px-6 py-2 sm:py-3 mt-4 sm:mt-6 transform sm:skew-x-6 inline-block comic-border pop-shadow relative speech-bubble">
+                        <div class="bg-yellow-400 text-black px-4 sm:px-6 py-2 sm:py-3 mt-4 sm:mt-6 transform skew-x-6 inline-block comic-border pop-shadow relative speech-bubble">
                             <p class="text-base sm:text-xl font-black uppercase">
                                 BAM! THE FUTURE OF REACTIVE WEB!
                             </p>
                         </div>
-                        <div class="hidden sm:block absolute top-4 right-4 bg-blue-500 text-white px-4 py-2 comic-border transform rotate-12">
-                            <span class="text-lg font-black">NEW!</span>
+                        <div class="absolute top-2 right-2 sm:top-4 sm:right-4 bg-blue-500 text-white px-2 py-1 sm:px-4 sm:py-2 comic-border transform rotate-12">
+                            <span class="text-xs sm:text-lg font-black">NEW!</span>
                         </div>
                     </div>
                 </header>
@@ -115,13 +111,13 @@ export const Scaffold = ({ children }: { children: unknown }) => (
                                         GITHUB! CLICK!
                                     </a>
                                 </p>
-                                <div class="hidden sm:block absolute -top-4 -left-4 bg-yellow-400 text-black px-3 py-2 comic-border transform -rotate-12">
-                                    <span class="font-black text-xs">
+                                <div class="absolute -top-3 -left-3 sm:-top-4 sm:-left-4 bg-yellow-400 text-black px-2 py-1 sm:px-3 sm:py-2 comic-border transform -rotate-12">
+                                    <span class="font-black text-[0.6rem] sm:text-xs">
                                         OPEN SOURCE!
                                     </span>
                                 </div>
-                                <div class="hidden sm:block absolute -bottom-4 -right-4 bg-red-500 text-white px-3 py-2 comic-border transform rotate-12">
-                                    <span class="font-black text-xs">
+                                <div class="absolute -bottom-3 -right-3 sm:-bottom-4 sm:-right-4 bg-red-500 text-white px-2 py-1 sm:px-3 sm:py-2 comic-border transform rotate-12">
+                                    <span class="font-black text-[0.6rem] sm:text-xs">
                                         FREE!
                                     </span>
                                 </div>
