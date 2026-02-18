@@ -13,7 +13,7 @@
         "indentWidth": 4
     },
     "tasks": {
-        "bundle": "rm -rf dist && mkdir -p dist && deno bundle src/hyperstim.ts -o dist/hyperstim.js && deno bundle src/hyperstim.ts --minify -o dist/hyperstim.min.js",
+        "bundle": "bash scripts/bundle.sh",
         "check": "deno check src/ --all",
         "website": "cd website && deno task start",
     },

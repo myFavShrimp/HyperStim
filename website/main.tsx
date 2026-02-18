@@ -9,7 +9,7 @@ app.get("/", (c) => {
 });
 
 const hyperstimJs = await Deno.readTextFile(
-    new URL("../dist/hyperstim.js", import.meta.url),
+    new URL("../dist/hyperstim.min.js", import.meta.url),
 );
 
 app.get("/hyperstim.js", (c) => {
