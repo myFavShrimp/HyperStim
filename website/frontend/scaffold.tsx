@@ -106,7 +106,7 @@ export const Scaffold = ({ children }: { children: unknown }) => (
                                 <p class="mt-4">
                                     <a
                                         href="https://github.com/myFavShrimp/hyperstim"
-                                        class="px-4 sm:px-6 py-3 bg-pink-500 text-white font-black text-base sm:text-lg comic-border hover:bg-pink-600 transform hover:scale-110 transition-all uppercase neon-glow inline-block pop-shadow"
+                                        class="px-4 sm:px-6 py-3 bg-pink-500 text-white font-black text-base sm:text-lg comic-border hover:bg-pink-600 transform active:scale-95 transition-all uppercase neon-glow inline-block pop-shadow"
                                     >
                                         GITHUB! CLICK!
                                     </a>

@@ -181,13 +181,13 @@ const Hero = () => (
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">
                     <a
                         href="#demos"
-                        class="px-6 py-3 bg-green-500 text-black font-black text-lg comic-border hover:bg-green-400 transform hover:scale-110 transition-all uppercase pop-shadow inline-block"
+                        class="px-6 py-3 bg-green-500 text-black font-black text-lg comic-border hover:bg-green-400 transform active:scale-95 transition-all uppercase pop-shadow inline-block"
                     >
                         SEE DEMOS!
                     </a>
                     <a
                         href="https://github.com/myFavShrimp/hyperstim"
-                        class="px-6 py-3 bg-pink-500 text-white font-black text-lg comic-border hover:bg-pink-400 transform hover:scale-110 transition-all uppercase pop-shadow inline-block"
+                        class="px-6 py-3 bg-pink-500 text-white font-black text-lg comic-border hover:bg-pink-400 transform active:scale-95 transition-all uppercase pop-shadow inline-block"
                     >
                         GET THE CODE!
                     </a>
@@ -293,19 +293,19 @@ const CounterDemo = () => (
                 <div class="flex flex-wrap justify-center gap-2">
                     <button
                         data-on-click="counter(counter() - 1)"
-                        class="px-4 sm:px-6 py-3 bg-red-600 text-white font-black text-lg sm:text-xl comic-border hover:bg-red-700 transform hover:scale-110 transition-all uppercase pop-shadow"
+                        class="px-4 sm:px-6 py-3 bg-red-600 text-white font-black text-lg sm:text-xl comic-border hover:bg-red-700 transform active:scale-95 transition-all uppercase pop-shadow"
                     >
                         BANG! -1
                     </button>
                     <button
                         data-on-click="counter(0)"
-                        class="px-4 sm:px-6 py-3 bg-gray-800 text-yellow-400 font-black text-lg sm:text-xl comic-border hover:bg-gray-900 transform hover:scale-110 transition-all uppercase pop-shadow"
+                        class="px-4 sm:px-6 py-3 bg-gray-800 text-yellow-400 font-black text-lg sm:text-xl comic-border hover:bg-gray-900 transform active:scale-95 transition-all uppercase pop-shadow"
                     >
                         ZAP! RESET
                     </button>
                     <button
                         data-on-click="counter(counter() + 1)"
-                        class="px-4 sm:px-6 py-3 bg-green-600 text-white font-black text-lg sm:text-xl comic-border hover:bg-green-700 transform hover:scale-110 transition-all uppercase pop-shadow"
+                        class="px-4 sm:px-6 py-3 bg-green-600 text-white font-black text-lg sm:text-xl comic-border hover:bg-green-700 transform active:scale-95 transition-all uppercase pop-shadow"
                     >
                         POW! +1
                     </button>
@@ -497,19 +497,19 @@ const FetchDemo = () => (
             <div class="flex flex-wrap gap-2">
                 <button
                     data-on-click="api().trigger()"
-                    class="px-4 sm:px-6 py-3 bg-blue-600 text-white font-black text-base sm:text-lg border-4 border-black hover:bg-blue-700 transform hover:scale-110 transition-all uppercase"
+                    class="px-4 sm:px-6 py-3 bg-blue-600 text-white font-black text-base sm:text-lg border-4 border-black hover:bg-blue-700 transform active:scale-95 transition-all uppercase"
                 >
                     LOAD USERS
                 </button>
                 <button
                     data-on-click="randomApi().trigger()"
-                    class="px-4 sm:px-6 py-3 bg-purple-600 text-white font-black text-base sm:text-lg border-4 border-black hover:bg-purple-700 transform hover:scale-110 transition-all uppercase"
+                    class="px-4 sm:px-6 py-3 bg-purple-600 text-white font-black text-base sm:text-lg border-4 border-black hover:bg-purple-700 transform active:scale-95 transition-all uppercase"
                 >
                     GET RANDOM
                 </button>
                 <button
                     data-on-click="api().abort()"
-                    class="px-4 sm:px-6 py-3 bg-red-600 text-white font-black text-base sm:text-lg border-4 border-black hover:bg-red-700 transform hover:scale-110 transition-all uppercase"
+                    class="px-4 sm:px-6 py-3 bg-red-600 text-white font-black text-base sm:text-lg border-4 border-black hover:bg-red-700 transform active:scale-95 transition-all uppercase"
                 >
                     ABORT
                 </button>
@@ -604,7 +604,7 @@ const FormDemo = () => (
             </div>
             <button
                 type="submit"
-                class="w-full px-6 py-4 bg-green-600 text-white font-black text-xl border-4 border-black hover:bg-green-700 transform hover:scale-105 transition-all uppercase neon-glow"
+                class="w-full px-6 py-4 bg-green-600 text-white font-black text-xl border-4 border-black hover:bg-green-700 transform active:scale-95 transition-all uppercase neon-glow"
             >
                 SUBMIT FORM!
             </button>
@@ -645,13 +645,13 @@ const SseDemo = () => (
             <div class="flex flex-wrap gap-2">
                 <button
                     data-on-click="stream().connect()"
-                    class="px-4 sm:px-6 py-3 bg-green-600 text-white font-black text-base sm:text-lg border-4 border-black hover:bg-green-700 transform hover:scale-110 transition-all uppercase"
+                    class="px-4 sm:px-6 py-3 bg-green-600 text-white font-black text-base sm:text-lg border-4 border-black hover:bg-green-700 transform active:scale-95 transition-all uppercase"
                 >
                     CONNECT
                 </button>
                 <button
                     data-on-click="stream().close()"
-                    class="px-4 sm:px-6 py-3 bg-red-600 text-white font-black text-base sm:text-lg border-4 border-black hover:bg-red-700 transform hover:scale-110 transition-all uppercase"
+                    class="px-4 sm:px-6 py-3 bg-red-600 text-white font-black text-base sm:text-lg border-4 border-black hover:bg-red-700 transform active:scale-95 transition-all uppercase"
                 >
                     DISCONNECT
                 </button>
@@ -732,7 +732,7 @@ const ModifiersDemo = () => (
                     {...{
                         "data-on-click__throttle.1s": "clicks(clicks() + 1)",
                     }}
-                    class="px-6 py-3 bg-blue-600 text-white font-black text-lg border-4 border-black hover:bg-blue-700 transform hover:scale-110 transition-all uppercase"
+                    class="px-6 py-3 bg-blue-600 text-white font-black text-lg border-4 border-black hover:bg-blue-700 transform active:scale-95 transition-all uppercase"
                 >
                     CLICK ME!
                 </button>
@@ -746,7 +746,7 @@ const ModifiersDemo = () => (
             <div>
                 <button
                     data-on-click__once="onceMessage('THIS ONLY WORKS ONCE!')"
-                    class="px-6 py-3 bg-orange-600 text-white font-black text-lg border-4 border-black hover:bg-orange-700 transform hover:scale-110 transition-all uppercase neon-glow"
+                    class="px-6 py-3 bg-orange-600 text-white font-black text-lg border-4 border-black hover:bg-orange-700 transform active:scale-95 transition-all uppercase neon-glow"
                 >
                     ONE-TIME BUTTON
                 </button>
