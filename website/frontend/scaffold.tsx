@@ -86,7 +86,9 @@ export const Scaffold = ({ children }: { children: unknown }) => (
                             </p>
                         </div>
                         <div class="absolute top-2 right-2 sm:top-4 sm:right-4 bg-blue-500 text-white px-2 py-1 sm:px-4 sm:py-2 comic-border transform rotate-12">
-                            <span class="text-xs sm:text-lg font-black">NEW!</span>
+                            <span class="text-xs sm:text-lg font-black">
+                                NEW!
+                            </span>
                         </div>
                     </div>
                 </header>

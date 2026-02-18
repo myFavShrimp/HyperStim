@@ -15,7 +15,7 @@
     "tasks": {
         "bundle": "bash scripts/bundle.sh",
         "check": "deno check src/ --all",
-        "website": "cd website && deno task start",
+        "website": "cd website && deno task start"
     },
     "imports": {
         "alien-signals": "npm:alien-signals@^2.0.5"

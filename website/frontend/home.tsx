@@ -229,11 +229,14 @@ const Install = () => (
             <div class="space-y-4">
                 <div>
                     <p class="text-yellow-300 font-black uppercase mb-2">
-                        1. BUILD FROM SOURCE:
+                        1. GRAB THE LATEST BUILD FROM{" "}
+                        <a
+                            href="https://github.com/myFavShrimp/HyperStim/releases/latest"
+                            class="underline text-cyan-400 hover:text-cyan-300"
+                        >
+                            GITHUB
+                        </a>
                     </p>
-                    <pre class="code-block">
-                        <code>deno task bundle</code>
-                    </pre>
                 </div>
                 <div>
                     <p class="text-yellow-300 font-black uppercase mb-2">
@@ -259,6 +262,16 @@ const Install = () => (
                     </pre>
                 </div>
             </div>
+            <p class="text-sm text-gray-400 font-normal mt-4">
+                Full build instructions can be found in the{" "}
+                <a
+                    href="https://github.com/myFavShrimp/HyperStim"
+                    class="underline text-cyan-400 hover:text-cyan-300"
+                >
+                    repository
+                </a>
+                .
+            </p>
         </div>
     </section>
 );

@@ -16,7 +16,9 @@ Signals are automatically created and made available globally, so `data-signals-
 
 ## Installation
 
-HyperStim encourages self-hosting and does not provide a CDN. Build from source:
+HyperStim encourages self-hosting and does not provide a CDN. The latest build can be found on the [releases page](https://github.com/myFavShrimp/HyperStim/releases/latest).
+
+Build from source:
 
 ```bash
 deno task bundle
