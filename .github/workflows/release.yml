@@ -27,7 +27,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           COMMIT_HASH=$(git rev-parse HEAD)
-          gh release create "$COMMIT_HASH" \
+          gh release create "build-$COMMIT_HASH" \
             dist/hyperstim.js \
             dist/hyperstim.min.js \
             --title "HyperStim $COMMIT_HASH" \
