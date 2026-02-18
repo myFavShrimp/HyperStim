@@ -7,7 +7,7 @@ mkdir -p dist
 deno bundle src/hyperstim.ts -o dist/hyperstim.js
 deno bundle src/hyperstim.ts --minify -o dist/hyperstim.min.js
 
-COMMIT_HASH=$(git rev-parse HEAD)
+COMMIT_HASH=$(git rev-parse HEAD 2> /dev/null || echo "unknown version")
 
 for file in dist/hyperstim.js dist/hyperstim.min.js; do
     sed -i "1i// HyperStim $COMMIT_HASH" "$file"
