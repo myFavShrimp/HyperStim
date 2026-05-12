@@ -5,10 +5,13 @@ type ExtendedForm = HTMLFormElement & {
     hsFetch?: FetchAction;
 };
 
-export function handleFormElement(
+export function handleHijackAttribute(
     element: Element,
+    _attributeArguments: string[],
+    _attributeModifiers: string[],
+    _attributeValue: string,
 ): void | CleanupFn {
-    if (element.nodeName !== "FORM" || !element.hasAttribute("data-hijack")) {
+    if (element.nodeName !== "FORM") {
         return;
     }
 

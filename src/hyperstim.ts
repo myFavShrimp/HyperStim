@@ -2,7 +2,6 @@ import {
     AttributeEvaluationFn,
     AttributeHandler,
     CleanupFn,
-    ElementHandler,
 } from "./types.ts";
 import { handleSignalsAttribute } from "./attributes/signals.ts";
 import { handleBindAtribute } from "./attributes/bind.ts";
@@ -10,9 +9,9 @@ import { handleOnAttribute } from "./attributes/on.ts";
 import { handleEffectAttribute } from "./attributes/effect.ts";
 import { handleComputedAttribute } from "./attributes/computed.ts";
 import { handleInitAttribute } from "./attributes/init.ts";
+import { handleHijackAttribute } from "./attributes/hijack.ts";
 import { fetch } from "./actions/fetch.ts";
 import { sse } from "./actions/sse.ts";
-import { handleFormElement } from "./elements/form.ts";
 import { computed, effect, signal } from "./signals.ts";
 
 globalThis.HyperStim ??= {
@@ -33,12 +32,10 @@ const attributeHandlers: Record<string, AttributeHandler> = {
     "bind": handleBindAtribute,
     "computed": handleComputedAttribute,
     "effect": handleEffectAttribute,
+    "hijack": handleHijackAttribute,
     "init": handleInitAttribute,
     "on": handleOnAttribute,
     "signals": handleSignalsAttribute,
-};
-const elementHandlers: Record<string, ElementHandler> = {
-    "FORM": handleFormElement,
 };
 
 type ExtendedElement = {
@@ -86,22 +83,6 @@ function processDataAttributes(element: Element) {
     }
 }
 
-function processNodesByName(element: Element) {
-    const elementHandler = elementHandlers[element.nodeName];
-
-    if (!elementHandler) return;
-
-    const cleanup = elementHandler(element);
-
-    if (cleanup) {
-        const extendedElement = element as ExtendedElement;
-
-        const elementCleanupList = extendedElement.__hyperstim_cleanup ?? [];
-        elementCleanupList.push(cleanup);
-        extendedElement.__hyperstim_cleanup = elementCleanupList;
-    }
-}
-
 export function processElement(
     rootElement: Element = document.documentElement,
 ) {
@@ -116,7 +97,6 @@ export function processElement(
         // Processing order is important to ensure signals defined
         // earlier in html are available on later nodes.
         queueMicrotask(() => processDataAttributes(element));
-        queueMicrotask(() => processNodesByName(element));
     }
 }
 
