@@ -100,21 +100,36 @@ export function processElement(
     }
 }
 
+function logInaccesibleNode(node: Node) {
+    console.warn(
+        "HyperStim: skipping inaccessible node",
+        node,
+    );
+}
+
 function initializeDomObserver() {
     const observer = new MutationObserver((records) => {
         for (const record of records) {
             for (const addedNode of record.addedNodes) {
-                if (addedNode.nodeType !== Node.ELEMENT_NODE) continue;
+                try {
+                    if (addedNode.nodeType !== Node.ELEMENT_NODE) continue;
 
-                processElement(addedNode as Element);
+                    processElement(addedNode as Element);
+                } catch {
+                    logInaccesibleNode(addedNode);
+                }
             }
 
             for (const removedNode of record.removedNodes) {
-                if (removedNode.nodeType !== Node.ELEMENT_NODE) continue;
+                try {
+                    if (removedNode.nodeType !== Node.ELEMENT_NODE) continue;
 
-                if (removedNode.nodeName === "BODY") continue;
+                    if (removedNode.nodeName === "BODY") continue;
 
-                runCleanupOnElement(removedNode as Element);
+                    runCleanupOnElement(removedNode as Element);
+                } catch {
+                    logInaccesibleNode(removedNode);
+                }
             }
         }
     });
